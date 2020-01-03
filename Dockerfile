@@ -15,7 +15,8 @@ RUN apt-get update && \
         libmpfr-dev \
         libgmp-dev \
         libxml2-dev \
-        nano
+        nano && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 USER rust
 
@@ -33,7 +34,9 @@ RUN cd /home/rust && \
     cd osxcross && \
     curl -L -o ./tarballs/MacOSX${OSXCROSS_SDK_VERSION}.sdk.tar.xz \
     https://s3.amazonaws.com/andrew-osx-sdks/MacOSX${OSXCROSS_SDK_VERSION}.sdk.tar.xz && \
-    env UNATTENDED=yes OSX_VERSION_MIN=10.7 ./build.sh
+    env UNATTENDED=yes OSX_VERSION_MIN=10.7 ./build.sh && \
+    rm -rf ./tarballs/MacOSX${OSXCROSS_SDK_VERSION}.sdk.tar.xz && \
+    rm -rf /tmp/*
 
 ENV PATH $PATH:/home/rust/osxcross/target/bin
 
