@@ -1,4 +1,4 @@
-FROM ekidd/rust-musl-builder:stable
+FROM ekidd/rust-musl-builder:1.40.0
 
 LABEL maintainer="Jose Quintana <joseluisq.net>"
 
@@ -36,7 +36,8 @@ RUN cd /home/rust && \
     https://s3.amazonaws.com/andrew-osx-sdks/MacOSX${OSXCROSS_SDK_VERSION}.sdk.tar.xz && \
     env UNATTENDED=yes OSX_VERSION_MIN=10.7 ./build.sh && \
     rm -rf ./tarballs/MacOSX${OSXCROSS_SDK_VERSION}.sdk.tar.xz && \
-    rm -rf /tmp/*
+    rm -rf /tmp/* && \
+    chmod g+s /home/rust
 
 ENV PATH $PATH:/home/rust/osxcross/target/bin
 

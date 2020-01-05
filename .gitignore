@@ -1,5 +1,5 @@
-/target
-/bin
+**/target
+**/bin
 **/*.rs.bk
 **/*.log
 /*.html
