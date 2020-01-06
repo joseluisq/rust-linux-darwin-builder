@@ -1,6 +1,6 @@
-# Rust Linux / Darwin Builder
+# Rust Linux / Darwin Builder [![Docker Image](https://img.shields.io/docker/pulls/joseluisq/rust-linux-darwin-builder.svg)](https://hub.docker.com/r/joseluisq/rust-linux-darwin-builder/)
 
-> A Docker image for compiling [Rust](https://www.rust-lang.org/) binaries for __Linux__ (static binaries via [musl-libc / musl-gcc](https://doc.rust-lang.org/edition-guide/rust-2018/platform-and-target-support/musl-support-for-fully-static-binaries.html)) and __macOS__ (via [osxcross](https://github.com/tpoechtrager/osxcross)).
+> Use same Docker image for compiling [Rust](https://www.rust-lang.org/) programs for Linux ([musl libc](https://doc.rust-lang.org/edition-guide/rust-2018/platform-and-target-support/musl-support-for-fully-static-binaries.html)) & macOS ([osxcross](https://github.com/tpoechtrager/osxcross)).
 
 ## Overview
 
@@ -14,21 +14,25 @@ __x86_64-unknown-linux-musl__
 
 ```sh
 docker run --rm \
-    -v "$PWD/sample":/home/rust/sample \
-    -w /home/rust/sample \
+    --user rust:rust \
+    --volume "${PWD}/sample":/home/rust/sample \
+    --workdir /home/rust/sample \
     joseluisq/rust-linux-darwin-builder:1.40.0 \
-    cargo build --release --target x86_64-unknown-linux-musl
+    sh -c "cargo build --release"
 ```
 
 __x86_64-apple-darwin__
 
 ```sh
 docker run --rm \
-    -v "$PWD/sample":/home/rust/sample \
-    -w /home/rust/sample \
+    --user rust:rust \
+    --volume "${PWD}/sample":/home/rust/sample \
+    --workdir /home/rust/sample \
     joseluisq/rust-linux-darwin-builder:1.40.0 \
-    cargo build --release --target x86_64-apple-darwin
+    sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
+
+*__Note:__ This example is also available under [./sample](./sample) directory.*
 
 ### Dockerfile
 
