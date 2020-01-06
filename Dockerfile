@@ -45,8 +45,8 @@ CMD /usr/bin/bash
 
 # Metadata
 LABEL org.opencontainers.image.vendor="Jose Quintana" \
-    org.opencontainers.image.url="https://github.com/joseluisq/rust-linux-musl-darwin-builder" \
-    org.opencontainers.image.title="Rust Linux Musl / Darwin Builder" \
-    org.opencontainers.image.description="Docker images for compiling Rust binaries for Linux (static binaries via musl-libc / musl-gcc) and macOS (via osxcross)." \
-    org.opencontainers.image.version="v0.0.0" \
-    org.opencontainers.image.documentation="https://github.com/joseluisq/rust-linux-musl-darwin-builder"
+    org.opencontainers.image.url="https://github.com/joseluisq/rust-linux-darwin-builder" \
+    org.opencontainers.image.title="Rust Linux / Darwin Builder" \
+    org.opencontainers.image.description="Use same Docker image for compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
+    org.opencontainers.image.version="v1.40.0" \
+    org.opencontainers.image.documentation="https://github.com/joseluisq/rust-linux-darwin-builder"
