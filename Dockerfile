@@ -41,7 +41,7 @@ RUN cd /home/rust && \
 
 ENV PATH $PATH:/home/rust/osxcross/target/bin
 
-CMD /usr/bin/bash
+CMD ["bash"]
 
 # Metadata
 LABEL org.opencontainers.image.vendor="Jose Quintana" \
