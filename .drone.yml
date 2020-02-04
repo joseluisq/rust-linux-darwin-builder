@@ -15,6 +15,7 @@ pipeline:
             - DOCKER_IMAGE_VERSION=${DRONE_TAG}
         when:
             event: tag
+        branch: master
 
     image-public:
         image: plugins/docker
@@ -30,6 +31,7 @@ pipeline:
             - DOCKER_IMAGE_VERSION=${DRONE_TAG}
         when:
             event: tag
+        branch: master
 
     notification-slack:
         image: plugins/slack

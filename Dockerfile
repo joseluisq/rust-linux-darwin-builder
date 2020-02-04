@@ -1,4 +1,4 @@
-FROM ekidd/rust-musl-builder:1.40.0
+FROM ekidd/rust-musl-builder:1.41.0
 
 LABEL maintainer="Jose Quintana <joseluisq.net>"
 
@@ -48,5 +48,5 @@ LABEL org.opencontainers.image.vendor="Jose Quintana" \
     org.opencontainers.image.url="https://github.com/joseluisq/rust-linux-darwin-builder" \
     org.opencontainers.image.title="Rust Linux / Darwin Builder" \
     org.opencontainers.image.description="Use same Docker image for compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
-    org.opencontainers.image.version="v1.40.0" \
+    org.opencontainers.image.version="v1.41.0" \
     org.opencontainers.image.documentation="https://github.com/joseluisq/rust-linux-darwin-builder"
