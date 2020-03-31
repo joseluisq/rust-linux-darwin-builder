@@ -4,19 +4,19 @@
 set -euo pipefail
 
 # Make sure we can build our main container.
-docker build -t ekidd/rust-musl-builder .
+docker build -t joseluisq/rust-linux-darwin-builder .
 
 # Make sure we can build our example derived container.
 docker build -t rust-musl-zlib examples/adding-a-library
 
 # Make sure we can build a multi-stage container.
-docker build -t rust-musl-builder-using-diesel examples/using-diesel
-docker run --rm rust-musl-builder-using-diesel
+docker build -t rust-linux-darwin-builder-diesel examples/using-diesel
+docker run --rm rust-linux-darwin-builder-diesel
 
 echo "==== Verifying static linking"
 
 # Make sure we can build a static executable.
-docker run --rm ekidd/rust-musl-builder bash -c "
+docker run --rm joseluisq/rust-linux-darwin-builder bash -c "
 set -euo pipefail
 export USER=rust
 cargo new --vcs none --bin testme
@@ -42,8 +42,8 @@ echo -e '[PASS] ARMhf binary is statically linked.\n'
 "
 
 # Make sure we can build a static executable using `git2`.
-docker build -t rust-musl-builder-linking-with-git2 examples/linking-with-git2
-docker run --rm rust-musl-builder-linking-with-git2 bash -c "
+docker build -t rust-linux-darwin-builder-with-git2 examples/linking-with-git2
+docker run --rm rust-linux-darwin-builder-with-git2 bash -c "
 set -euo pipefail
 cd /home/rust/src
 

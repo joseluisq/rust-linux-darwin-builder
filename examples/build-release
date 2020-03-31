@@ -6,7 +6,7 @@
 # https://github.com/emk/rust-musl-builder/blob/master/examples/build-release
 #
 # Called by `.travis.yml` to build release binaries.  We use
-# ekidd/rust-musl-builder to make the Linux binaries so that we can run
+# joseluisq/rust-linux-darwin-builder to make the Linux binaries so that we can run
 # them unchanged on any distro, including tiny distros like Alpine (which
 # is heavily used for Docker containers).  Other platforms get regular
 # binaries, which will generally be dynamically linked against libc.
@@ -18,7 +18,7 @@ set -euo pipefail
 
 case `uname -s` in
     Linux)
-        echo "Building static binaries using ekidd/rust-musl-builder"
+        echo "Building static binaries using joseluisq/rust-linux-darwin-builder"
         docker build -t build-"$1"-image .
         docker run -it --name build-"$1" build-"$1"-image
         docker cp build-"$1":/home/rust/src/target/x86_64-unknown-linux-musl/release/"$1" "$1"

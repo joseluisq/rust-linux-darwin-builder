@@ -1,7 +1,7 @@
 build:
 	docker build \
 		-t joseluisq/rust-linux-darwin-builder:1 \
-		-f Dockerfile .
+		-f docker/Dockerfile .
 .PHONY: build
 
 release:

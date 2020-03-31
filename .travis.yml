@@ -7,7 +7,7 @@ os:
   - linux
 
 script:
-- bash ./test-image
+- bash ./image_test.sh
 
 notifications:
   email:
