@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Make sure we can build our main container.
-docker build -t joseluisq/rust-linux-darwin-builder .
+docker build -t joseluisq/rust-linux-darwin-builder -f docker/Dockerfile .
 
 # Make sure we can build our example derived container.
 docker build -t rust-musl-zlib examples/adding-a-library

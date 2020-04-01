@@ -20,7 +20,7 @@ steps:
   image: joseluisq/rust-linux-darwin-builder:latest
   pull: if-not-exists
   commands:
-    - ./docker/image_test.sh
+    - make test
 
 trigger:
   event:

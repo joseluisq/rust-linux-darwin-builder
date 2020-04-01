@@ -7,9 +7,7 @@ os:
   - linux
 
 script:
-- bash ./docker/image_test.sh
+- make test
 
 notifications:
-  email:
-    on_success: never
-    on_failure: always
+  email: false

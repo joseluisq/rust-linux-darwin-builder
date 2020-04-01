@@ -171,8 +171,7 @@ RUN set -eux \
     && curl -L -o ./tarballs/MacOSX${OSXCROSS_SDK_VERSION}.sdk.tar.xz \
     https://s3.amazonaws.com/andrew-osx-sdks/MacOSX${OSXCROSS_SDK_VERSION}.sdk.tar.xz \
     && env UNATTENDED=yes OSX_VERSION_MIN=10.7 ./build.sh \
-    && ./cleanup.sh \
-    && rm -rf ./taballs \
+    && rm -rf *~ taballs *.tar.xz \
     && rm -rf /tmp/*
 
 ENV PATH $PATH:/home/rust/osxcross/target/bin
