@@ -10,7 +10,8 @@ ARG TOOLCHAIN=stable
 
 # The OpenSSL version to use. We parameterize this because many Rust
 # projects will fail to build with 1.1.
-ARG OPENSSL_VERSION=1.0.2r
+# File: openssl-1.0.2u.tar.gz (2019-Dec-20 13:25:43)
+ARG OPENSSL_VERSION=1.0.2
 
 # Make sure we have basic dev tools for building C libraries. Our goal
 # here is to support the musl-libc builds and Cargo builds needed for a
@@ -108,8 +109,8 @@ RUN set -eux \
     && sudo ln -s /usr/include/x86_64-linux-gnu/asm /usr/local/musl/include/asm \
     && sudo ln -s /usr/include/asm-generic /usr/local/musl/include/asm-generic \
     && cd /tmp \
-    && curl -LO "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" \
-    && tar xvzf "openssl-$OPENSSL_VERSION.tar.gz" && cd "openssl-$OPENSSL_VERSION" \
+    && curl -LO "https://www.openssl.org/source/old/${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}u.tar.gz" \
+    && tar xvzf "openssl-${OPENSSL_VERSION}u.tar.gz" && cd "openssl-${OPENSSL_VERSION}u" \
     && env CC=musl-gcc ./Configure no-shared no-zlib -fPIC --prefix=/usr/local/musl -DOPENSSL_NO_SECURE_MEMORY linux-x86_64 \
     && env C_INCLUDE_PATH=/usr/local/musl/include/ make depend \
     && env C_INCLUDE_PATH=/usr/local/musl/include/ make \
