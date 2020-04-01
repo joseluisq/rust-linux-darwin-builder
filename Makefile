@@ -37,3 +37,7 @@ release:
 	git push origin master
 	git push origin $(TAG)
 .ONESHELL: release
+
+promote:
+	@drone build promote joseluisq/rust-linux-darwin-builder $(BUILD) $(ENV)
+.PHONY: promote
