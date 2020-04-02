@@ -17,7 +17,7 @@ ARG OPENSSL_VERSION=1.0.2
 # here is to support the musl-libc builds and Cargo builds needed for a
 # large selection of the most popular crates.
 RUN set -eux \
-	&& DEBIAN_FRONTEND=noninteractive apt-get update -qq \
+    && DEBIAN_FRONTEND=noninteractive apt-get update -qq \
     && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends --no-install-suggests \
         build-essential \
         ca-certificates \
@@ -45,36 +45,19 @@ RUN set -eux \
         sudo \
         xutils-dev \
         zlib1g-dev \
-# We also set up a `rust` user by default, in whose account we'll install
-# the Rust toolchain. This user has sudo privileges if you need to install
-# any more software.
-    && useradd rust --user-group --create-home --shell /bin/bash --groups sudo \
-# `mdbook` is the standard Rust tool for making searchable HTML manuals.
-    && MDBOOK_VERSION=0.2.1 && \
-    curl -LO https://github.com/rust-lang-nursery/mdBook/releases/download/v$MDBOOK_VERSION/mdbook-v$MDBOOK_VERSION-x86_64-unknown-linux-musl.tar.gz && \
-    tar xf mdbook-v$MDBOOK_VERSION-x86_64-unknown-linux-musl.tar.gz && \
-    mv mdbook /usr/local/bin/ && \
-    rm -f mdbook-v$MDBOOK_VERSION-x86_64-unknown-linux-musl.tar.gz \
 # Clean up local repository of retrieved packages and remove the package lists
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Static linking for C++ code
 RUN set -eux \
-    && sudo ln -s "/usr/bin/g++" "/usr/bin/musl-g++"
-
-# Allow sudo without a password.
-ADD docker/sudoers /etc/sudoers.d/nopasswd
-
-# Run all further code as user `rust`, and create our working directories
-# as the appropriate user.
-USER rust
-RUN set -eux \
-    && mkdir -p /home/rust/libs /home/rust/src
+    && ln -s "/usr/bin/g++" "/usr/bin/musl-g++" \
+# Create appropriate directories for current user
+    && mkdir -p /root/libs /root/src
 
 # Set up our path with all our binary directories, including those for the
 # musl-gcc toolchain and for our Rust toolchain.
-ENV PATH=/home/rust/.cargo/bin:/usr/local/musl/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=/root/.cargo/bin:/usr/local/musl/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Install our Rust toolchain and the `musl` target.  We patch the
 # command-line we pass to the installer so that it won't attempt to
@@ -86,7 +69,7 @@ RUN set -eux \
     && rustup target add x86_64-unknown-linux-musl \
     && rustup target add armv7-unknown-linux-musleabihf \
     && rustup target add x86_64-apple-darwin
-ADD docker/cargo-config.toml /home/rust/.cargo/config
+ADD docker/cargo-config.toml /root/.cargo/config
 
 # Set up a `git credentials` helper for using GH_USER and GH_TOKEN to access
 # private repositories if desired.
@@ -166,7 +149,7 @@ ENV OSXCROSS_SDK_VERSION 10.11
 
 RUN set -eux \
     && echo "Building osxcross..." \
-    && cd /home/rust \
+    && cd /usr/local/ \
     && git clone --depth 1 https://github.com/tpoechtrager/osxcross \
     && cd osxcross \
     && curl -L -o ./tarballs/MacOSX${OSXCROSS_SDK_VERSION}.sdk.tar.xz \
@@ -175,11 +158,10 @@ RUN set -eux \
     && rm -rf *~ taballs *.tar.xz \
     && rm -rf /tmp/*
 
-ENV PATH $PATH:/home/rust/osxcross/target/bin
+ENV PATH $PATH:/usr/local/osxcross/target/bin
 
-# Expect our source code to live in /home/rust/src.  We'll run the build as
-# user `rust`, which will be uid 1000, gid 1000 outside the container.
-WORKDIR /home/rust/src
+# Expect our source code to live in /root/src
+WORKDIR /root/src
 
 CMD ["bash"]
 

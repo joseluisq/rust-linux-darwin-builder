@@ -13,7 +13,6 @@ test:
 .PHONY: test
 
 ci-test:
-	@sudo chown -R rust:rust ./
 	@echo "Testing application..."
 	@rustc -vV
 	@echo

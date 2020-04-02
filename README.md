@@ -10,24 +10,24 @@ This is a __Linux Docker image__ based on [ekidd/rust-musl-builder](https://hub.
 
 ### Compiling an application inside a Docker container
 
-__x86_64-unknown-linux-musl__
+By default the working directory is `/root/src`.
+
+#### x86_64-unknown-linux-musl
 
 ```sh
 docker run --rm \
-    --user rust:rust \
-    --volume "${PWD}/sample":/home/rust/sample \
-    --workdir /home/rust/sample \
+    --volume "${PWD}/sample":/root/src \
+    --workdir /root/src \
     joseluisq/rust-linux-darwin-builder:1.42.0 \
     sh -c "cargo build --release"
 ```
 
-__x86_64-apple-darwin__
+#### x86_64-apple-darwin
 
 ```sh
 docker run --rm \
-    --user rust:rust \
-    --volume "${PWD}/sample":/home/rust/sample \
-    --workdir /home/rust/sample \
+    --volume "${PWD}/sample":/root/src \
+    --workdir /root/src \
     joseluisq/rust-linux-darwin-builder:1.42.0 \
     sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
@@ -40,24 +40,14 @@ You can also use the image as a base for your own Dockerfile:
 FROM joseluisq/rust-linux-darwin-builder:1.42.0
 ```
 
-### Custom directories
-
-By default this image uses a `rust` user and the default working directory is `/home/rust`.
-If you want to use a different directory, change the corresponding owner and group as well.
-
-```sh
-sudo chown -R rust:rust /custom/directory
-```
-
-#### Cross-compilation example
+### Cross-compilation example
 
 Below a simple example using a `Makefile` for cross-compiling a Rust app.
 
 Notes:
 
 - A [hello world](./tests/hello-world) app is used.
-- A custom directory is used below as working directory (instead of `/home/rust`).
-- If you want to use the default `/home/rust` as working directory, owner and group change is not necessary.
+- A custom directory is used below as working directory instead of `/root/src`.
 
 Create a Makefile:
 
@@ -71,7 +61,6 @@ compile:
 .PHONY: compile
 
 cross-compile:
-	@sudo chown -R rust:rust ./
 	@echo
 	@echo "1. Cross compiling example..."
 	@rustc -vV
