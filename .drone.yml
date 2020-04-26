@@ -22,16 +22,22 @@ steps:
   commands:
     - make ci-test
 
-trigger:
-  event:
-    - push
-    - pull_request
-    - tag
-
 volumes:
   - name: dockersock
     host:
       path: /var/run/docker.sock
+
+trigger:
+  event:
+    - push
+    - pull_request
+  branch:
+    - master
+    - develop
+    - feature/*
+    - bugfix/*
+    - hotfix/*
+    - release/*
 
 
 ---
@@ -58,8 +64,14 @@ steps:
       - DOCKER_IMAGE_VERSION=${DRONE_TAG}
 
 trigger:
-  target:
-  - production
+  ref:
+    include:
+    - refs/tags/v*
+    exclude:
+    - refs/tags/**rc**
+    - refs/tags/**alpha**
+    - refs/tags/**beta**
+    - refs/tags/**latest**
 
 
 ---
