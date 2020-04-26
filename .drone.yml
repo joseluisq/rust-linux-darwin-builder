@@ -56,8 +56,6 @@ steps:
     auto_tag: true
     build_args:
       - DOCKER_IMAGE_VERSION=${DRONE_TAG}
-    tags:
-      - "latest"
 
 trigger:
   target:
