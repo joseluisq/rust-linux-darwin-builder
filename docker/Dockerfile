@@ -1,5 +1,5 @@
 # NOTE: Most of Dockerfile and related files were borrowed from
-#       https://hub.docker.com/r/joseluisq/rust-linux-darwin-builder
+#       https://hub.docker.com/r/ekidd/rust-musl-builder
 
 FROM debian:buster-slim
 
@@ -170,5 +170,5 @@ LABEL org.opencontainers.image.vendor="Jose Quintana" \
     org.opencontainers.image.url="https://github.com/joseluisq/rust-linux-darwin-builder" \
     org.opencontainers.image.title="Rust Linux / Darwin Builder" \
     org.opencontainers.image.description="Use same Docker image for compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
-    org.opencontainers.image.version="v1.42.0" \
+    org.opencontainers.image.version="v1.43.0" \
     org.opencontainers.image.documentation="https://github.com/joseluisq/rust-linux-darwin-builder"
