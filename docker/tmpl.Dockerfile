@@ -8,9 +8,21 @@ LABEL maintainer="Jose Quintana <git.io/joseluisq>"
 # The Rust toolchain to use when building our image. Set by `hooks/build`.
 ARG TOOLCHAIN=stable
 
+
+# Dependencies
+
 # OpenSSL v1.1.1
-# File: openssl-1.1.1g.tar.gz (2020-Apr-21 13:01:56)
-ARG OPENSSL_VERSION=1.1.1
+ARG OPENSSL_VERSION=1.1.1g
+
+# zlib - http://zlib.net/
+ARG ZLIB_VERSION=1.2.11
+
+# libpq - https://ftp.postgresql.org/pub/source/
+ARG POSTGRESQL_VERSION=11.7
+
+# Mac OS X SDK version for OS X Cross
+ARG MACOSX_SDK_VERSION=10.11
+
 
 # Make sure we have basic dev tools for building C libraries. Our goal
 # here is to support the musl-libc builds and Cargo builds needed for a
@@ -94,8 +106,9 @@ RUN set -eux \
     && ln -s /usr/include/x86_64-linux-gnu/asm /usr/local/musl/include/asm \
     && ln -s /usr/include/asm-generic /usr/local/musl/include/asm-generic \
     && cd /tmp \
-    && curl -LO "https://www.openssl.org/source/openssl-${OPENSSL_VERSION}g.tar.gz" \
-    && tar xvzf "openssl-${OPENSSL_VERSION}g.tar.gz" && cd "openssl-${OPENSSL_VERSION}g" \
+    && curl -LO "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" \
+    && tar xvzf "openssl-$OPENSSL_VERSION.tar.gz" \
+    && cd "openssl-$OPENSSL_VERSION" \
     && env CC=musl-gcc ./Configure no-shared no-zlib -fPIC --prefix=/usr/local/musl -DOPENSSL_NO_SECURE_MEMORY linux-x86_64 \
     && env C_INCLUDE_PATH=/usr/local/musl/include/ make depend \
     && env C_INCLUDE_PATH=/usr/local/musl/include/ make \
@@ -108,7 +121,6 @@ RUN set -eux \
 RUN set -eux \
     && echo "Building zlib..." \
     && cd /tmp \
-    && env ZLIB_VERSION=1.2.11 \
     && curl -LO "http://zlib.net/zlib-$ZLIB_VERSION.tar.gz" \
     && tar xzf "zlib-$ZLIB_VERSION.tar.gz" \
     && cd "zlib-$ZLIB_VERSION" \
@@ -121,7 +133,6 @@ RUN set -eux \
 RUN set -eux \
     && echo "Building libpq..." \
     && cd /tmp \
-    && env POSTGRESQL_VERSION=11.2 \
     && curl -LO "https://ftp.postgresql.org/pub/source/v$POSTGRESQL_VERSION/postgresql-$POSTGRESQL_VERSION.tar.gz" \
     && tar xzf "postgresql-$POSTGRESQL_VERSION.tar.gz" \
     && cd "postgresql-$POSTGRESQL_VERSION" \
@@ -155,15 +166,13 @@ ENV OPENSSL_DIR=/usr/local/musl/ \
 # Install OS X Cross
 # A Mac OS X cross toolchain for Linux, FreeBSD, OpenBSD and Android
 
-ENV MACOSX_SDK_VERSION 10.11
-
 RUN set -eux \
     && echo "Building osxcross..." \
     && cd /usr/local/ \
     && git clone --depth 1 https://github.com/tpoechtrager/osxcross \
     && cd osxcross \
-    && curl -L -o ./tarballs/MacOSX${MACOSX_SDK_VERSION}.sdk.tar.xz \
-        https://s3.amazonaws.com/andrew-osx-sdks/MacOSX${MACOSX_SDK_VERSION}.sdk.tar.xz \
+    && curl -L -o "./tarballs/MacOSX$MACOSX_SDK_VERSION.sdk.tar.xz" \
+        "https://s3.amazonaws.com/andrew-osx-sdks/MacOSX$MACOSX_SDK_VERSION.sdk.tar.xz" \
     && env UNATTENDED=yes OSX_VERSION_MIN=10.7 ./build.sh \
     && rm -rf *~ taballs *.tar.xz \
     && rm -rf /tmp/* \
