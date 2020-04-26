@@ -30,8 +30,8 @@ release:
 	./docker/version.sh $(TAG)
 
 	# 2. Commit and push to latest tag
-	git add docker/Dockerfile
-	git commit docker/Dockerfile -m "$(TAG)"
+	git add .
+	git commit . -m "$(TAG)"
 	git tag $(TAG)
 	git push origin master
 	git push origin $(TAG)
