@@ -2,6 +2,11 @@
 
 > Use same Docker image for compiling [Rust](https://www.rust-lang.org/) programs for Linux ([musl libc](https://doc.rust-lang.org/edition-guide/rust-2018/platform-and-target-support/musl-support-for-fully-static-binaries.html)) & macOS ([osxcross](https://github.com/tpoechtrager/osxcross)).
 
+## OpenSSL Release Notes
+
+Until `v1.42.0` of this project, one old OpenSSL release `v1.0.2` was used. 
+Now, since `v1.43.x` or greater, OpenSSL `v1.1.1` (LTS) is used which is supported until `2023-09-11`. View more at https://www.openssl.org/policies/releasestrat.html.
+
 ## Overview
 
 This is a __Linux Docker image__ based on [ekidd/rust-musl-builder](https://hub.docker.com/r/ekidd/rust-musl-builder) but using [debian:buster-slim](https://hub.docker.com/_/debian?tab=tags&page=1&name=buster-slim). It contains essential tools for compile [Rust](https://www.rust-lang.org/) projects such as __Linux__ static binaries via [musl-libc / musl-gcc](https://doc.rust-lang.org/edition-guide/rust-2018/platform-and-target-support/musl-support-for-fully-static-binaries.html) (`x86_64-unknown-linux-musl`) and __macOS__ binaries (`x86_64-apple-darwin`) via [osxcross](https://github.com/tpoechtrager/osxcross) just using the same Linux image.
@@ -18,7 +23,7 @@ By default the working directory is `/root/src`.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.42.0 \
+    joseluisq/rust-linux-darwin-builder:1.43.0 \
     sh -c "cargo build --release"
 ```
 
@@ -28,7 +33,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.42.0 \
+    joseluisq/rust-linux-darwin-builder:1.43.0 \
     sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -37,7 +42,7 @@ docker run --rm \
 You can also use the image as a base for your own Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.42.0
+FROM joseluisq/rust-linux-darwin-builder:1.43.0
 ```
 
 ### Cross-compilation example
@@ -56,7 +61,7 @@ compile:
 	@docker run --rm -it \
 		-v $(PWD):/drone/src \
 		-w /drone/src \
-			joseluisq/rust-linux-darwin-builder:1.42.0 \
+			joseluisq/rust-linux-darwin-builder:1.43.0 \
 				make cross-compile
 .PHONY: compile
 
@@ -81,12 +86,12 @@ Just run the makefile `compile` target, then you will see two release binaries `
 make compile
 # 1. Cross compiling example...
 
-# rustc 1.42.0 (b8cedc004 2020-03-09)
+# rustc 1.43.0 (b8cedc004 2020-03-09)
 # binary: rustc
 # commit-hash: b8cedc00407a4c56a3bda1ed605c6fc166655447
 # commit-date: 2020-03-09
 # host: x86_64-unknown-linux-gnu
-# release: 1.42.0
+# release: 1.43.0
 # LLVM version: 9.0
 
 # 2. Compiling application (linux-musl x86_64)...
