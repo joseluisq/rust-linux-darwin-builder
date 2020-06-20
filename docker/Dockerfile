@@ -189,5 +189,5 @@ LABEL org.opencontainers.image.vendor="Jose Quintana" \
     org.opencontainers.image.url="https://github.com/joseluisq/rust-linux-darwin-builder" \
     org.opencontainers.image.title="Rust Linux / Darwin Builder" \
     org.opencontainers.image.description="Use same Docker image for compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
-    org.opencontainers.image.version="v1.43.1" \
+    org.opencontainers.image.version="v1.44.1" \
     org.opencontainers.image.documentation="https://github.com/joseluisq/rust-linux-darwin-builder"
