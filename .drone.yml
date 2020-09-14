@@ -51,7 +51,8 @@ platform:
 
 steps:
 - name: publish
-  image: plugins/docker
+  image: joseluisq/drone-docker
+  privileged: true
   settings:
     repo: joseluisq/rust-linux-darwin-builder
     dockerfile: ./docker/Dockerfile
@@ -59,9 +60,11 @@ steps:
       from_secret: dockerhub_username
     password:
       from_secret: dockerhub_password
-    auto_tag: true
     build_args:
       - DOCKER_IMAGE_VERSION=${DRONE_TAG}
+    auto_tag: true
+    auto_tag_aliases:
+      - latest
 
 trigger:
   ref:
