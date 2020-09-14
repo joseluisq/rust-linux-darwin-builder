@@ -18,7 +18,7 @@ ARG OPENSSL_VERSION=1.1.1g
 ARG ZLIB_VERSION=1.2.11
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=11.7
+ARG POSTGRESQL_VERSION=11.9
 
 # Mac OS X SDK version for OS X Cross
 ARG MACOSX_SDK_VERSION=10.11
@@ -49,11 +49,9 @@ RUN set -eux \
         lzma-dev \
         musl-dev \
         musl-tools \
-        nano \
         patch \
         pkgconf \
         python \
-        sudo \
         xutils-dev \
         zlib1g-dev \
 # Clean up local repository of retrieved packages and remove the package lists
@@ -146,11 +144,8 @@ RUN set -eux \
     && rm -r /tmp/* \
     && true
 
-ENV OPENSSL_DIR=/usr/local/musl/ \
-    OPENSSL_INCLUDE_DIR=/usr/local/musl/include/ \
-    DEP_OPENSSL_INCLUDE=/usr/local/musl/include/ \
-    OPENSSL_LIB_DIR=/usr/local/musl/lib/ \
-    OPENSSL_STATIC=1 \
+ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/musl/ \
+    X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_STATIC=1 \
     PQ_LIB_STATIC_X86_64_UNKNOWN_LINUX_MUSL=1 \
     PG_CONFIG_X86_64_UNKNOWN_LINUX_GNU=/usr/bin/pg_config \
     PKG_CONFIG_ALLOW_CROSS=true \
