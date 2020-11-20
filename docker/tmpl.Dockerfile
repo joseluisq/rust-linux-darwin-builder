@@ -18,7 +18,7 @@ ARG OPENSSL_VERSION=1.1.1g
 ARG ZLIB_VERSION=1.2.11
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=11.9
+ARG POSTGRESQL_VERSION=11.10
 
 # Mac OS X SDK version for OS X Cross
 ARG MACOSX_SDK_VERSION=10.11
