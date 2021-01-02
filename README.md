@@ -23,7 +23,7 @@ By default the working directory is `/root/src`.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.47.0 \
+    joseluisq/rust-linux-darwin-builder:1.49.0 \
     sh -c "cargo build --release"
 ```
 
@@ -33,7 +33,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.47.0 \
+    joseluisq/rust-linux-darwin-builder:1.49.0 \
     sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -42,20 +42,25 @@ docker run --rm \
 You can also use the image as a base for your own Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.47.0
+FROM joseluisq/rust-linux-darwin-builder:1.49.0
 ```
 
 ### OSXCross
 
 You can also use o32-clang(++) and o64-clang(++) like a normal compiler.
 
+__Notes:__
+
+- The current 10.15 SDK does not support i386 anymore. Use <= 10.13 SDK if you rely on i386 support.
+- The current 10.15 SDK does not support libstdc++ anymore. Use <= 10.13 SDK if you rely on libstdc++ support.
+
 Examples:
 
 ```sh
-Example 1: CC=o32-clang ./configure --host=i386-apple-darwin15
-Example 2: CC=i386-apple-darwin15-clang ./configure --host=i386-apple-darwin15
+Example 1: CC=o32-clang ./configure --host=i386-apple-darwin19
+Example 2: CC=i386-apple-darwin19-clang ./configure --host=i386-apple-darwin19
 Example 3: o64-clang -Wall test.c -o test
-Example 4: x86_64-apple-darwin15-strip -x test
+Example 4: x86_64-apple-darwin19-strip -x test
 ```
 
 ### Cross-compilation example
