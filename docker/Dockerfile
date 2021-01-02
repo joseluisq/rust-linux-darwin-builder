@@ -12,17 +12,22 @@ ARG TOOLCHAIN=stable
 # Dependencies
 
 # OpenSSL v1.1.1
-ARG OPENSSL_VERSION=1.1.1g
+# https://www.openssl.org/source/old/1.1.1/
+ARG OPENSSL_VERSION=1.1.1h
 
 # zlib - http://zlib.net/
 ARG ZLIB_VERSION=1.2.11
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=11.10
+ARG POSTGRESQL_VERSION=13.1
 
-# Mac OS X SDK version for OS X Cross
-ARG MACOSX_SDK_VERSION=10.11
+# Mac OS X SDK version
+ARG OSX_SDK_VERSION=10.15
+ARG OSX_SDK_SUM=aee7b132a4b10cc26ab9904706412fd0907f5b8b660251e465647d8763f9f009
 
+# OS X Cross
+ARG OSX_CROSS_COMMIT=4287300a5c96397a2ee9ab3942e66578a1982031
+ARG OSX_VERSION_MIN=10.14
 
 # Make sure we have basic dev tools for building C libraries. Our goal
 # here is to support the musl-libc builds and Cargo builds needed for a
@@ -54,7 +59,7 @@ RUN set -eux \
         python \
         xutils-dev \
         zlib1g-dev \
-# Clean up local repository of retrieved packages and remove the package lists
+    # Clean up local repository of retrieved packages and remove the package lists
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && true
@@ -62,7 +67,7 @@ RUN set -eux \
 # Static linking for C++ code
 RUN set -eux \
     && ln -s "/usr/bin/g++" "/usr/bin/musl-g++" \
-# Create appropriate directories for current user
+    # Create appropriate directories for current user
     && mkdir -p /root/libs /root/src \
     && true
 
@@ -89,7 +94,7 @@ RUN set -eux \
     && git config --global credential.https://github.com.helper ghtoken \
     && true
 
-# Build a static library version of OpenSSL using musl-libc.  This is needed by
+# Build a static library version of OpenSSL using musl-libc. This is needed by
 # the popular Rust `hyper` crate.
 #
 # We point /usr/local/musl/include/linux at some Linux kernel headers (not
@@ -97,16 +102,16 @@ RUN set -eux \
 # component. It's possible that this will cause bizarre and terrible things to
 # happen. There may be "sanitized" header
 RUN set -eux \
-    && echo "Building OpenSSL..." \
+    && echo "Building OpenSSL ${OPENSSL_VERSION}..." \
     && ls /usr/include/linux \
     && mkdir -p /usr/local/musl/include \
     && ln -s /usr/include/linux /usr/local/musl/include/linux \
     && ln -s /usr/include/x86_64-linux-gnu/asm /usr/local/musl/include/asm \
     && ln -s /usr/include/asm-generic /usr/local/musl/include/asm-generic \
     && cd /tmp \
-    && curl -LO "https://www.openssl.org/source/openssl-$OPENSSL_VERSION.tar.gz" \
-    && tar xvzf "openssl-$OPENSSL_VERSION.tar.gz" \
-    && cd "openssl-$OPENSSL_VERSION" \
+    && curl -LO "https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz" \
+    && tar xvzf "openssl-${OPENSSL_VERSION}.tar.gz" \
+    && cd "openssl-${OPENSSL_VERSION}" \
     && env CC=musl-gcc ./Configure no-shared no-zlib -fPIC --prefix=/usr/local/musl -DOPENSSL_NO_SECURE_MEMORY linux-x86_64 \
     && env C_INCLUDE_PATH=/usr/local/musl/include/ make depend \
     && env C_INCLUDE_PATH=/usr/local/musl/include/ make \
@@ -117,11 +122,11 @@ RUN set -eux \
     && true
 
 RUN set -eux \
-    && echo "Building zlib..." \
+    && echo "Building zlib ${ZLIB_VERSION}..." \
     && cd /tmp \
-    && curl -LO "http://zlib.net/zlib-$ZLIB_VERSION.tar.gz" \
-    && tar xzf "zlib-$ZLIB_VERSION.tar.gz" \
-    && cd "zlib-$ZLIB_VERSION" \
+    && curl -LO "http://zlib.net/zlib-${ZLIB_VERSION}.tar.gz" \
+    && tar xzf "zlib-${ZLIB_VERSION}.tar.gz" \
+    && cd "zlib-${ZLIB_VERSION}" \
     && env CC=musl-gcc ./configure --static --prefix=/usr/local/musl \
     && make \
     && make install \
@@ -129,11 +134,11 @@ RUN set -eux \
     && true
 
 RUN set -eux \
-    && echo "Building libpq..." \
+    && echo "Building libpq ${POSTGRESQL_VERSION}..." \
     && cd /tmp \
-    && curl -LO "https://ftp.postgresql.org/pub/source/v$POSTGRESQL_VERSION/postgresql-$POSTGRESQL_VERSION.tar.gz" \
-    && tar xzf "postgresql-$POSTGRESQL_VERSION.tar.gz" \
-    && cd "postgresql-$POSTGRESQL_VERSION" \
+    && curl -LO "https://ftp.postgresql.org/pub/source/v${POSTGRESQL_VERSION}/postgresql-${POSTGRESQL_VERSION}.tar.gz" \
+    && tar xzf "postgresql-${POSTGRESQL_VERSION}.tar.gz" \
+    && cd "postgresql-${POSTGRESQL_VERSION}" \
     && env CC=musl-gcc CPPFLAGS=-I/usr/local/musl/include LDFLAGS=-L/usr/local/musl/lib ./configure --with-openssl --without-readline --prefix=/usr/local/musl \
     && cd src/interfaces/libpq \
     && make all-static-lib \
@@ -162,13 +167,21 @@ ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/musl/ \
 # A Mac OS X cross toolchain for Linux, FreeBSD, OpenBSD and Android
 
 RUN set -eux \
-    && echo "Building osxcross..." \
-    && cd /usr/local/ \
-    && git clone --depth 1 https://github.com/tpoechtrager/osxcross \
-    && cd osxcross \
-    && curl -L -o "./tarballs/MacOSX$MACOSX_SDK_VERSION.sdk.tar.xz" \
-        "https://s3.amazonaws.com/andrew-osx-sdks/MacOSX$MACOSX_SDK_VERSION.sdk.tar.xz" \
-    && env UNATTENDED=yes OSX_VERSION_MIN=10.7 ./build.sh \
+    && echo "Cloning osxcross..." \
+    && git clone https://github.com/tpoechtrager/osxcross.git /usr/local/osxcross \
+    && cd /usr/local/osxcross \
+    && git checkout -q "${OSX_CROSS_COMMIT}" \
+    && rm -rf ./.git \
+    && true
+
+RUN set -eux \
+    && echo "Building osxcross with ${OSX_SDK_VERSION}..." \
+    && cd /usr/local/osxcross \
+    && curl -Lo "./tarballs/MacOSX${OSX_SDK_VERSION}.sdk.tar.xz" \
+        "https://github.com/joseluisq/macosx-sdks/releases/download/${OSX_SDK_VERSION}/MacOSX${OSX_SDK_VERSION}.sdk.tar.xz" \
+    && echo "${OSX_SDK_SUM}  ./tarballs/MacOSX${OSX_SDK_VERSION}.sdk.tar.xz" \
+        | sha256sum -c - \
+    && env UNATTENDED=yes OSX_VERSION_MIN=${OSX_VERSION_MIN} ./build.sh \
     && rm -rf *~ taballs *.tar.xz \
     && rm -rf /tmp/* \
     && true
