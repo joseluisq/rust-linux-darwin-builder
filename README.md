@@ -121,6 +121,20 @@ make compile
 # 240K	tests/hello-world/target/x86_64-apple-darwin/release/helloworld
 ```
 
+### Building *-sys crates
+
+If some of your crates require C bindings and you run into compilation or linking errors, try to use Clang for C/C++ builds.
+
+For example to cros compile to Macos:
+
+```sh
+CC=o64-clang \
+CXX=o64-clang++ \
+	cargo build --target x86_64-apple-darwin
+```
+
+Read more details about it take a look at [Cross compiling Rust from Linux to macOS](https://wapl.es/rust/2019/02/17/rust-cross-compile-linux-to-macos.html) by James Waples.
+
 ## Contributions
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in current work by you, as defined in the Apache-2.0 license, shall be dual licensed as described below, without any additional terms or conditions.
