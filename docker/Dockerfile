@@ -19,11 +19,11 @@ ARG OPENSSL_VERSION=1.1.1h
 ARG ZLIB_VERSION=1.2.11
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=13.1
+ARG POSTGRESQL_VERSION=13.2
 
 # Mac OS X SDK version
-ARG OSX_SDK_VERSION=10.15
-ARG OSX_SDK_SUM=aee7b132a4b10cc26ab9904706412fd0907f5b8b660251e465647d8763f9f009
+ARG OSX_SDK_VERSION=11.1
+ARG OSX_SDK_SUM=97a916b0b68aae9dcd32b7d12422ede3e5f34db8e169fa63bfb18ec410b8f5d9
 
 # OS X Cross
 ARG OSX_CROSS_COMMIT=4287300a5c96397a2ee9ab3942e66578a1982031
@@ -197,5 +197,5 @@ LABEL org.opencontainers.image.vendor="Jose Quintana" \
     org.opencontainers.image.url="https://github.com/joseluisq/rust-linux-darwin-builder" \
     org.opencontainers.image.title="Rust Linux / Darwin Builder" \
     org.opencontainers.image.description="Use same Docker image for compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
-    org.opencontainers.image.version="v1.49.0" \
+    org.opencontainers.image.version="v1.50.0" \
     org.opencontainers.image.documentation="https://github.com/joseluisq/rust-linux-darwin-builder"
