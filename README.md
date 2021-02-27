@@ -139,7 +139,7 @@ CXX=o64-clang++ \
 	cargo build --target x86_64-apple-darwin
 ```
 
-Read more details about it take a look at [Cross compiling Rust from Linux to macOS](https://wapl.es/rust/2019/02/17/rust-cross-compile-linux-to-macos.html) by James Waples.
+For more details take a look at [Cross compiling Rust from Linux to macOS](https://wapl.es/rust/2019/02/17/rust-cross-compile-linux-to-macos.html) by James Waples.
 
 ## Contributions
 

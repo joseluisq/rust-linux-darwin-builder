@@ -25,18 +25,6 @@ ci-test:
 	@du -sh tests/hello-world/target/x86_64-apple-darwin/release/helloworld
 .ONESHELL: ci-test
 
-release:
-	# 1. Update docker files to latest tag
-	./docker/version.sh $(TAG)
-
-	# 2. Commit and push to latest tag
-	git add .
-	git commit . -m "$(TAG)"
-	git tag $(TAG)
-	git push origin master
-	git push origin $(TAG)
-.ONESHELL: release
-
 promote:
 	@drone build promote joseluisq/rust-linux-darwin-builder $(BUILD) $(ENV)
 .PHONY: promote

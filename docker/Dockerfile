@@ -5,9 +5,12 @@ FROM debian:buster-slim
 
 LABEL maintainer="Jose Quintana <git.io/joseluisq>"
 
-# The Rust toolchain to use when building our image. Set by `hooks/build`.
-ARG TOOLCHAIN=stable
+ARG VERSION=0.0.0
+ENV VERSION=${VERSION}
 
+
+# Rust stable toolchain
+ARG TOOLCHAIN=stable
 
 # Dependencies
 
@@ -114,9 +117,9 @@ RUN set -eux \
     && cd "openssl-${OPENSSL_VERSION}" \
     && env CC=musl-gcc ./Configure no-shared no-zlib -fPIC --prefix=/usr/local/musl -DOPENSSL_NO_SECURE_MEMORY linux-x86_64 \
     && env C_INCLUDE_PATH=/usr/local/musl/include/ make depend \
-    && env C_INCLUDE_PATH=/usr/local/musl/include/ make \
-    && make install_sw \
-    && make install_ssldirs \
+    && env C_INCLUDE_PATH=/usr/local/musl/include/ make -j8 \
+    && make -j8 install_sw \
+    && make -j8 install_ssldirs \
     && rm /usr/local/musl/include/linux /usr/local/musl/include/asm /usr/local/musl/include/asm-generic \
     && openssl version \
     && rm -r /tmp/* \
@@ -198,5 +201,5 @@ LABEL org.opencontainers.image.vendor="Jose Quintana" \
     org.opencontainers.image.url="https://github.com/joseluisq/rust-linux-darwin-builder" \
     org.opencontainers.image.title="Rust Linux / Darwin Builder" \
     org.opencontainers.image.description="Use same Docker image for compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
-    org.opencontainers.image.version="v1.50.0" \
+    org.opencontainers.image.version="$VERSION" \
     org.opencontainers.image.documentation="https://github.com/joseluisq/rust-linux-darwin-builder"
