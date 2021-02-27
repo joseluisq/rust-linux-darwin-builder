@@ -129,7 +129,8 @@ RUN set -eux \
     && cd "zlib-${ZLIB_VERSION}" \
     && env CC=musl-gcc ./configure --static --prefix=/usr/local/musl \
     && make \
-    && make install \
+    && make install_sw \
+    && make install_ssldirs \
     && rm -r /tmp/* \
     && true
 
