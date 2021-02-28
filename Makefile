@@ -9,21 +9,22 @@ test:
 		-v $(PWD):/drone/src \
 		-w /drone/src \
 			joseluisq/rust-linux-darwin-builder:latest \
-				make ci-test
+				make test-ci
 .PHONY: test
 
-ci-test:
+test-ci:
 	@echo "Testing application..."
 	@rustc -vV
 	@echo
-	@echo "Compiling application(linux-musl x86_64)..."
-	@cargo build --manifest-path=tests/hello-world/Cargo.toml --release --target x86_64-unknown-linux-musl
-	@du -sh tests/hello-world/target/x86_64-unknown-linux-musl/release/helloworld
-	@echo
-	@echo "Compiling application(apple-darwin x86_64)..."
-	@cargo build --manifest-path=tests/hello-world/Cargo.toml --release --target x86_64-apple-darwin
-	@du -sh tests/hello-world/target/x86_64-apple-darwin/release/helloworld
-.ONESHELL: ci-test
+	@cd tests/hello-world \
+		&& echo "Compiling application(linux-musl x86_64)..." \
+		&& cargo build --release --target x86_64-unknown-linux-musl \
+		&& du -sh target/x86_64-unknown-linux-musl/release/helloworld \
+		&& echo \
+		&& echo "Compiling application(apple-darwin x86_64)..." \
+		&& cargo build --release --target x86_64-apple-darwin \
+		&& du -sh target/x86_64-apple-darwin/release/helloworld
+.ONESHELL: test-ci
 
 promote:
 	@drone build promote joseluisq/rust-linux-darwin-builder $(BUILD) $(ENV)

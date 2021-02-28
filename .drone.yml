@@ -20,7 +20,7 @@ steps:
   image: joseluisq/rust-linux-darwin-builder:latest
   pull: if-not-exists
   commands:
-    - make ci-test
+    - make test-ci
 
 volumes:
   - name: dockersock

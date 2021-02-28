@@ -1,0 +1,26 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Cache Docker layers
+        uses: mattes/cached-docker-build-action@v1
+        with:
+          args: "-t joseluisq/rust-linux-darwin-builder:latest -f docker/Dockerfile ."
+          cache_key: "${{ hashFiles('**/lockfiles') }}"
+      -
+        name: Test cross-compile
+        uses: addnab/docker-run-action@v1
+        with:
+          image: joseluisq/rust-linux-darwin-builder:latest
+          options: -v ${{ github.workspace }}:/root/src
+          shell: bash
+          run: |
+            make test-ci
