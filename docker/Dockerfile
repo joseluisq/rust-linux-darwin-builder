@@ -27,10 +27,10 @@ ARG POSTGRESQL_VERSION=13.2
 # Mac OS X SDK version
 ARG OSX_SDK_VERSION=11.1
 ARG OSX_SDK_SUM=97a916b0b68aae9dcd32b7d12422ede3e5f34db8e169fa63bfb18ec410b8f5d9
+ARG OSX_VERSION_MIN=10.14
 
 # OS X Cross
-ARG OSX_CROSS_COMMIT=4287300a5c96397a2ee9ab3942e66578a1982031
-ARG OSX_VERSION_MIN=10.14
+ARG OSX_CROSS_COMMIT=035cc170338b7b252e3f13b0e3ccbf4411bffc41
 
 # Make sure we have basic dev tools for building C libraries. Our goal
 # here is to support the musl-libc builds and Cargo builds needed for a
