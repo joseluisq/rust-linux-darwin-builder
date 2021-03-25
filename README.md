@@ -4,10 +4,11 @@
 
 > Use same Docker image for compiling [Rust](https://www.rust-lang.org/) programs for Linux ([musl libc](https://doc.rust-lang.org/edition-guide/rust-2018/platform-and-target-support/musl-support-for-fully-static-binaries.html)) & macOS ([osxcross](https://github.com/tpoechtrager/osxcross)).
 
-## OpenSSL Release Notes
+#### OpenSSL Release Notes
 
-Until `v1.42.0` of this project, one old OpenSSL release `v1.0.2` was used. 
-Now, since `v1.43.x` or greater, OpenSSL `v1.1.1` (LTS) is used which is supported until `2023-09-11`. View more at https://www.openssl.org/policies/releasestrat.html.
+> _Until `v1.42.0` of this project, one old OpenSSL release `v1.0.2` was used._ <br>
+> _Now, since `v1.43.x` or greater, OpenSSL `v1.1.1` (LTS) is used which is supported until `2023-09-11`. <br>
+> View more at https://www.openssl.org/policies/releasestrat.html._
 
 ## Overview
 
@@ -25,7 +26,7 @@ By default the working directory is `/root/src`.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.50.0 \
+    joseluisq/rust-linux-darwin-builder:1.51.0 \
     sh -c "cargo build --release"
 ```
 
@@ -35,7 +36,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.50.0 \
+    joseluisq/rust-linux-darwin-builder:1.51.0 \
     sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -44,7 +45,7 @@ docker run --rm \
 You can also use the image as a base for your own Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.50.0
+FROM joseluisq/rust-linux-darwin-builder:1.51.0
 ```
 
 ### OSXCross
