@@ -16,7 +16,7 @@ ARG TOOLCHAIN=stable
 
 # OpenSSL v1.1.1
 # https://www.openssl.org/source/old/1.1.1/
-ARG OPENSSL_VERSION=1.1.1i
+ARG OPENSSL_VERSION=1.1.1k
 
 # zlib - http://zlib.net/
 ARG ZLIB_VERSION=1.2.11
