@@ -26,7 +26,7 @@ By default the working directory is `/root/src`.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.51.0 \
+    joseluisq/rust-linux-darwin-builder:1.52.0 \
     sh -c "cargo build --release"
 ```
 
@@ -36,7 +36,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.51.0 \
+    joseluisq/rust-linux-darwin-builder:1.52.0 \
     sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -45,7 +45,7 @@ docker run --rm \
 You can also use the image as a base for your own Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.51.0
+FROM joseluisq/rust-linux-darwin-builder:1.52.0
 ```
 
 ### OSXCross

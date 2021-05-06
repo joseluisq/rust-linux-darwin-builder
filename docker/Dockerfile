@@ -30,7 +30,7 @@ ARG OSX_SDK_SUM=97a916b0b68aae9dcd32b7d12422ede3e5f34db8e169fa63bfb18ec410b8f5d9
 ARG OSX_VERSION_MIN=10.14
 
 # OS X Cross
-ARG OSX_CROSS_COMMIT=61925a29c404fc547ce9d51eb2ee4a09bd6533da
+ARG OSX_CROSS_COMMIT=5771a847950abefed9a37e2d16ee10e0dd90c641
 
 # Make sure we have basic dev tools for building C libraries. Our goal
 # here is to support the musl-libc builds and Cargo builds needed for a
@@ -117,9 +117,9 @@ RUN set -eux \
     && cd "openssl-${OPENSSL_VERSION}" \
     && env CC=musl-gcc ./Configure no-shared no-zlib -fPIC --prefix=/usr/local/musl -DOPENSSL_NO_SECURE_MEMORY linux-x86_64 \
     && env C_INCLUDE_PATH=/usr/local/musl/include/ make depend \
-    && env C_INCLUDE_PATH=/usr/local/musl/include/ make -j8 \
-    && make -j8 install_sw \
-    && make -j8 install_ssldirs \
+    && env C_INCLUDE_PATH=/usr/local/musl/include/ make -j$(nproc) \
+    && make -j$(nproc) install_sw \
+    && make -j$(nproc) install_ssldirs \
     && rm /usr/local/musl/include/linux /usr/local/musl/include/asm /usr/local/musl/include/asm-generic \
     && openssl version \
     && rm -r /tmp/* \
@@ -132,8 +132,8 @@ RUN set -eux \
     && tar xzf "zlib-${ZLIB_VERSION}.tar.gz" \
     && cd "zlib-${ZLIB_VERSION}" \
     && env CC=musl-gcc ./configure --static --prefix=/usr/local/musl \
-    && make \
-    && make install \
+    && make -j$(nproc) \
+    && make -j$(nproc) install \
     && rm -r /tmp/* \
     && true
 
@@ -145,11 +145,11 @@ RUN set -eux \
     && cd "postgresql-${POSTGRESQL_VERSION}" \
     && env CC=musl-gcc CPPFLAGS=-I/usr/local/musl/include LDFLAGS=-L/usr/local/musl/lib ./configure --with-openssl --without-readline --prefix=/usr/local/musl \
     && cd src/interfaces/libpq \
-    && make all-static-lib \
-    && make install-lib-static \
+    && make -j$(nproc) all-static-lib \
+    && make -j$(nproc) install-lib-static \
     && cd ../../bin/pg_config \
-    && make \
-    && make install \
+    && make -j$(nproc) \
+    && make -j$(nproc) install \
     && rm -r /tmp/* \
     && true
 
