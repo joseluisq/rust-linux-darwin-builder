@@ -26,7 +26,7 @@ By default the working directory is `/root/src`.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.53.0 \
+    joseluisq/rust-linux-darwin-builder:1.54.0 \
     sh -c "cargo build --release"
 ```
 
@@ -36,7 +36,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.53.0 \
+    joseluisq/rust-linux-darwin-builder:1.54.0 \
     sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -45,7 +45,7 @@ docker run --rm \
 You can also use the image as a base for your own Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.53.0
+FROM joseluisq/rust-linux-darwin-builder:1.54.0
 ```
 
 ### OSXCross
@@ -54,22 +54,22 @@ You can also use o32-clang(++) and o64-clang(++) like a normal compiler.
 
 __Notes:__
 
-- The current *11.1 SDK* does not support i386 anymore. Use <= 10.13 SDK if you rely on i386 support.
-- The current *11.1 SDK* does not support libstdc++ anymore. Use <= 10.13 SDK if you rely on libstdc++ support.
+- The current *11.3 SDK* does not support i386 anymore. Use <= 10.13 SDK if you rely on i386 support.
+- The current *11.3 SDK* does not support libstdc++ anymore. Use <= 10.13 SDK if you rely on libstdc++ support.
 
 Examples:
 
 ```sh
 Example usage:
 
-Example 1: CC=o32-clang ./configure --host=i386-apple-darwin20.2
-Example 2: CC=i386-apple-darwin20.2-clang ./configure --host=i386-apple-darwin20.2
+Example 1: CC=o32-clang ./configure --host=i386-apple-darwin20.4
+Example 2: CC=i386-apple-darwin20.4-clang ./configure --host=i386-apple-darwin20.4
 Example 3: o64-clang -Wall test.c -o test
-Example 4: x86_64-apple-darwin20.2-strip -x test
+Example 4: x86_64-apple-darwin20.4-strip -x test
 
-!!! Use aarch64-apple-darwin20.2-* instead of arm64-* when dealing with Automake !!!
-!!! CC=aarch64-apple-darwin20.2-clang ./configure --host=aarch64-apple-darwin20.2 !!!
-!!! CC="aarch64-apple-darwin20.2-clang -arch arm64e" ./configure --host=aarch64-apple-darwin20.2 !!!
+!!! Use aarch64-apple-darwin20.4-* instead of arm64-* when dealing with Automake !!!
+!!! CC=aarch64-apple-darwin20.4-clang ./configure --host=aarch64-apple-darwin20.4 !!!
+!!! CC="aarch64-apple-darwin20.4-clang -arch arm64e" ./configure --host=aarch64-apple-darwin20.4 !!!
 ```
 
 ### Cross-compilation example
