@@ -40,6 +40,10 @@ docker run --rm \
     sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
+### Cargo Home advice
+
+It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-home.html#cargo-home) points to `$HOME/.cargo` by default (`/root/.cargo` in this case). However if you want to use a custom Cargo home directory make sure to copy the Cargo `config` file to the particular directory like `cp "$HOME/.cargo/config" "$CARGO_HOME/"` before to cross-compile your program. Otherwise you could face a linkage error when for example you want to cross-compile to an `x86_64-apple-darwin` target.
+
 ### Dockerfile
 
 You can also use the image as a base for your own Dockerfile:
