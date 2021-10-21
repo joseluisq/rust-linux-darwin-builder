@@ -3,10 +3,12 @@
 
 FROM debian:buster-slim
 
-LABEL maintainer="Jose Quintana <git.io/joseluisq>"
-
 ARG VERSION=0.0.0
 ENV VERSION=${VERSION}
+
+LABEL version="${VERSION}" \
+    description="Use same Docker image for compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
+    maintainer="Jose Quintana <joseluisq.net>"
 
 
 # Rust stable toolchain
@@ -22,15 +24,15 @@ ARG OPENSSL_VERSION=1.1.1k
 ARG ZLIB_VERSION=1.2.11
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=13.4
+ARG POSTGRESQL_VERSION=14.0
 
-# Mac OS X SDK version
+# Mac OS X SDK version - https://github.com/joseluisq/macosx-sdks
 ARG OSX_SDK_VERSION=11.3
 ARG OSX_SDK_SUM=9adc1373d3879e1973d28ad9f17c9051b02931674a3ec2a2498128989ece2cb1
 ARG OSX_VERSION_MIN=10.14
 
-# OS X Cross
-ARG OSX_CROSS_COMMIT=de6c72eff2d6013f5af46fba1fa205654c5cf5e2
+# OS X Cross - https://github.com/tpoechtrager/osxcross
+ARG OSX_CROSS_COMMIT=de6ec57895713a090fee05cbc58e43b5d916ba33
 
 # Make sure we have basic dev tools for building C libraries. Our goal
 # here is to support the musl-libc builds and Cargo builds needed for a
