@@ -1,7 +1,7 @@
 # NOTE: Most of Dockerfile and related were borrowed from
 #       https://hub.docker.com/r/ekidd/rust-musl-builder
 
-FROM debian:buster-slim
+FROM debian:11-slim
 
 ARG VERSION=0.0.0
 ENV VERSION=${VERSION}
@@ -52,7 +52,7 @@ RUN set -eux \
         libmpc-dev \
         libmpfr-dev \
         libpq-dev \
-        libsqlite-dev \
+        libsqlite3-dev \
         libssl-dev \
         libxml2-dev \
         linux-libc-dev \
