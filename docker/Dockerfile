@@ -52,7 +52,7 @@ RUN set -eux \
         libmpc-dev \
         libmpfr-dev \
         libpq-dev \
-        libsqlite-dev \
+        libsqlite3-dev \
         libssl-dev \
         libxml2-dev \
         linux-libc-dev \

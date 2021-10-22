@@ -12,7 +12,7 @@
 
 ## Overview
 
-This is a __Linux Docker image__ based on [ekidd/rust-musl-builder](https://hub.docker.com/r/ekidd/rust-musl-builder) but using [debian:buster-slim](https://hub.docker.com/_/debian?tab=tags&page=1&name=buster-slim). It contains essential tools for compile [Rust](https://www.rust-lang.org/) projects such as __Linux__ static binaries via [musl-libc / musl-gcc](https://doc.rust-lang.org/edition-guide/rust-2018/platform-and-target-support/musl-support-for-fully-static-binaries.html) (`x86_64-unknown-linux-musl`) and __macOS__ binaries (`x86_64-apple-darwin`) via [osxcross](https://github.com/tpoechtrager/osxcross) just using the same Linux image.
+This is a __Linux Docker image__ based on [ekidd/rust-musl-builder](https://hub.docker.com/r/ekidd/rust-musl-builder) but using [debian:11-slim](https://hub.docker.com/_/debian?tab=tags&page=1&name=11-slim). It contains essential tools for compile [Rust](https://www.rust-lang.org/) projects such as __Linux__ static binaries via [musl-libc / musl-gcc](https://doc.rust-lang.org/edition-guide/rust-2018/platform-and-target-support/musl-support-for-fully-static-binaries.html) (`x86_64-unknown-linux-musl`) and __macOS__ binaries (`x86_64-apple-darwin`) via [osxcross](https://github.com/tpoechtrager/osxcross) just using the same Linux image.
 
 ## Usage
 
