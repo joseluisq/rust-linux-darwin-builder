@@ -32,7 +32,7 @@ ARG OSX_SDK_SUM=9adc1373d3879e1973d28ad9f17c9051b02931674a3ec2a2498128989ece2cb1
 ARG OSX_VERSION_MIN=10.14
 
 # OS X Cross - https://github.com/tpoechtrager/osxcross
-ARG OSX_CROSS_COMMIT=de6ec57895713a090fee05cbc58e43b5d916ba33
+ARG OSX_CROSS_COMMIT=e59a63461da2cbc20cb0a5bbfc954730e50a5472
 
 # Make sure we have basic dev tools for building C libraries. Our goal
 # here is to support the musl-libc builds and Cargo builds needed for a
