@@ -38,7 +38,7 @@ By default the working directory is `/root/src`.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.56.1 \
+    joseluisq/rust-linux-darwin-builder:1.57.0 \
     sh -c "cargo build --release"
 ```
 
@@ -50,7 +50,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.56.1 \
+    joseluisq/rust-linux-darwin-builder:1.57.0 \
     sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -63,7 +63,7 @@ It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-h
 You can also use the image as a base for your own Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.56.1
+FROM joseluisq/rust-linux-darwin-builder:1.57.0
 ```
 
 ### OSXCross
@@ -80,14 +80,14 @@ Examples:
 ```sh
 Example usage:
 
-Example 1: CC=o32-clang ./configure --host=i386-apple-darwin20.4
-Example 2: CC=i386-apple-darwin20.4-clang ./configure --host=i386-apple-darwin20.4
+Example 1: CC=o32-clang ./configure --host=i386-apple-darwin21.1
+Example 2: CC=i386-apple-darwin21.1-clang ./configure --host=i386-apple-darwin21.1
 Example 3: o64-clang -Wall test.c -o test
-Example 4: x86_64-apple-darwin20.4-strip -x test
+Example 4: x86_64-apple-darwin21.1-strip -x test
 
-!!! Use aarch64-apple-darwin20.4-* instead of arm64-* when dealing with Automake !!!
-!!! CC=aarch64-apple-darwin20.4-clang ./configure --host=aarch64-apple-darwin20.4 !!!
-!!! CC="aarch64-apple-darwin20.4-clang -arch arm64e" ./configure --host=aarch64-apple-darwin20.4 !!!
+!!! Use aarch64-apple-darwin21.1-* instead of arm64-* when dealing with Automake !!!
+!!! CC=aarch64-apple-darwin21.1-clang ./configure --host=aarch64-apple-darwin21.1 !!!
+!!! CC="aarch64-apple-darwin21.1-clang -arch arm64e" ./configure --host=aarch64-apple-darwin21.1 !!!
 ```
 
 ### Cross-compilation example
@@ -106,7 +106,7 @@ compile:
 	@docker run --rm -it \
 		-v $(PWD):/drone/src \
 		-w /drone/src \
-			joseluisq/rust-linux-darwin-builder:1.56.1 \
+			joseluisq/rust-linux-darwin-builder:1.57.0 \
 				make cross-compile
 .PHONY: compile
 
@@ -131,12 +131,12 @@ Just run the makefile `compile` target, then you will see two release binaries `
 make compile
 # 1. Cross compiling example...
 
-# rustc 1.56.1 (59eed8a2a 2021-11-01)
+# rustc 1.57.0 (f1edd0429 2021-11-29)
 # binary: rustc
-# commit-hash: 59eed8a2aac0230a8b53e89d4e99d55912ba6b35
-# commit-date: 2021-11-01
+# commit-hash: f1edd0429582dd29cccacaf50fd134b05593bd9c
+# commit-date: 2021-11-29
 # host: x86_64-unknown-linux-gnu
-# release: 1.56.1
+# release: 1.57.0
 # LLVM version: 13.0.0
 
 # 2. Compiling application (linux-musl x86_64)...
