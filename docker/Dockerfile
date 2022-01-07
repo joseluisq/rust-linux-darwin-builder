@@ -18,7 +18,7 @@ ARG TOOLCHAIN=stable
 
 # OpenSSL v1.1.1
 # https://www.openssl.org/source/old/1.1.1/
-ARG OPENSSL_VERSION=1.1.1k
+ARG OPENSSL_VERSION=1.1.1l
 
 # zlib - http://zlib.net/
 ARG ZLIB_VERSION=1.2.11
@@ -32,7 +32,7 @@ ARG OSX_SDK_SUM=ac07f28c09e6a3b09a1c01f1535ee71abe8017beaedd09181c8f08936a510ffd
 ARG OSX_VERSION_MIN=10.14
 
 # OS X Cross - https://github.com/tpoechtrager/osxcross
-ARG OSX_CROSS_COMMIT=d904031e7e3faa8a23c21b319a65cc915dac51b3
+ARG OSX_CROSS_COMMIT=062922bbb81ac52787d8e53fa4af190acb552ec7
 
 # Make sure we have basic dev tools for building C libraries. Our goal
 # here is to support the musl-libc builds and Cargo builds needed for a
