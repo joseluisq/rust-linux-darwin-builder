@@ -38,7 +38,7 @@ By default the working directory is `/root/src`.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.58.1 \
+    joseluisq/rust-linux-darwin-builder:1.59.0 \
     sh -c "cargo build --release"
 ```
 
@@ -50,7 +50,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.58.1 \
+    joseluisq/rust-linux-darwin-builder:1.59.0 \
     sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -63,7 +63,7 @@ It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-h
 You can also use the image as a base for your own Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.58.1
+FROM joseluisq/rust-linux-darwin-builder:1.59.0
 ```
 
 ### OSXCross
@@ -106,7 +106,7 @@ compile:
 	@docker run --rm -it \
 		-v $(PWD):/drone/src \
 		-w /drone/src \
-			joseluisq/rust-linux-darwin-builder:1.58.1 \
+			joseluisq/rust-linux-darwin-builder:1.59.0 \
 				make cross-compile
 .PHONY: compile
 
@@ -131,13 +131,13 @@ Just run the makefile `compile` target, then you will see two release binaries `
 make compile
 # 1. Cross compiling example...
 
-# rustc 1.58.1 (db9d1b20b 2022-01-20)
+# rustc 1.59.0 (9d1b2106e 2022-02-23)
 # binary: rustc
-# commit-hash: db9d1b20bba1968c1ec1fc49616d4742c1725b4b
-# commit-date: 2022-01-20
-# host: x86_64-unknown-linux-gnu
-# release: 1.58.1
-# LLVM version: 13.0.0
+# commit-hash: 9d1b2106e23b1abd32fce1f17267604a5102f57a
+# commit-date: 2022-02-23
+# host: x86_64-apple-darwin
+# release: 1.59.0
+# LLVM version: 13.0.
 
 # 2. Compiling application (linux-musl x86_64)...
 #     Finished release [optimized] target(s) in 0.01s
