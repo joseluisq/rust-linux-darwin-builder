@@ -21,7 +21,7 @@ ARG TOOLCHAIN=stable
 ARG OPENSSL_VERSION=1.1.1l
 
 # zlib - http://zlib.net/
-ARG ZLIB_VERSION=1.2.11
+ARG ZLIB_VERSION=1.2.12
 
 # libpq - https://ftp.postgresql.org/pub/source/
 ARG POSTGRESQL_VERSION=14.2
