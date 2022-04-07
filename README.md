@@ -38,7 +38,7 @@ By default the working directory is `/root/src`.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.59.0 \
+    joseluisq/rust-linux-darwin-builder:1.60.0 \
     sh -c "cargo build --release"
 ```
 
@@ -50,20 +50,20 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.59.0 \
+    joseluisq/rust-linux-darwin-builder:1.60.0 \
     sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
 ### Cargo Home advice
 
-It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-home.html#cargo-home) points to `$HOME/.cargo` by default (`/root/.cargo` in this case). However if you want to use a custom Cargo home directory make sure to copy the Cargo `config` file to the particular directory like `cp "$HOME/.cargo/config" "$CARGO_HOME/"` before to cross-compile your program. Otherwise you could face a linkage error when for example if you want to cross-compile to an `x86_64-apple-darwin` target.
+It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-home.html#cargo-home) points to `$HOME/.cargo` by default (`/root/.cargo` in this case). However if you want to use a custom Cargo home directory then make sure to copy the Cargo `config` file to the particular directory like `cp "$HOME/.cargo/config" "$CARGO_HOME/"` before to cross-compile your program. Otherwise you could face a linking error when for example you want to cross-compile to an `x86_64-apple-darwin` target.
 
 ### Dockerfile
 
 You can also use the image as a base for your own Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.59.0
+FROM joseluisq/rust-linux-darwin-builder:1.60.0
 ```
 
 ### OSXCross
@@ -106,7 +106,7 @@ compile:
 	@docker run --rm -it \
 		-v $(PWD):/drone/src \
 		-w /drone/src \
-			joseluisq/rust-linux-darwin-builder:1.59.0 \
+			joseluisq/rust-linux-darwin-builder:1.60.0 \
 				make cross-compile
 .PHONY: compile
 
@@ -131,13 +131,13 @@ Just run the makefile `compile` target, then you will see two release binaries `
 make compile
 # 1. Cross compiling example...
 
-# rustc 1.59.0 (9d1b2106e 2022-02-23)
+# rustc 1.60.0 (7737e0b5c 2022-04-04)
 # binary: rustc
-# commit-hash: 9d1b2106e23b1abd32fce1f17267604a5102f57a
-# commit-date: 2022-02-23
-# host: x86_64-apple-darwin
-# release: 1.59.0
-# LLVM version: 13.0.
+# commit-hash: 7737e0b5c4103216d6fd8cf941b7ab9bdbaace7c
+# commit-date: 2022-04-04
+# host: x86_64-unknown-linux-gnu
+# release: 1.60.0
+# LLVM version: 14.0.0
 
 # 2. Compiling application (linux-musl x86_64)...
 #     Finished release [optimized] target(s) in 0.01s
