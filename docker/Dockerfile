@@ -40,6 +40,8 @@ ARG OSX_CROSS_COMMIT=be2b79f444aa0b43b8695a4fb7b920bf49ecc01c
 RUN set -eux \
     && DEBIAN_FRONTEND=noninteractive apt-get update -qq \
     && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends --no-install-suggests \
+        autoconf \
+        automake \
         build-essential \
         ca-certificates \
         clang \
@@ -48,21 +50,27 @@ RUN set -eux \
         file \
         gcc-arm-linux-gnueabihf \
         git \
+        libbz2-dev \
         libgmp-dev \
+        libicu-dev \
         libmpc-dev \
         libmpfr-dev \
         libpq-dev \
         libsqlite3-dev \
         libssl-dev \
+        libtool \
         libxml2-dev \
         linux-libc-dev \
+        llvm-dev \
         lzma-dev \
         musl-dev \
         musl-tools \
         patch \
         pkgconf \
         python \
+        python3 \
         xutils-dev \
+        yasm \
         zlib1g-dev \
     # Clean up local repository of retrieved packages and remove the package lists
     && apt-get clean \
@@ -188,11 +196,28 @@ RUN set -eux \
     && echo "${OSX_SDK_SUM}  ./tarballs/MacOSX${OSX_SDK_VERSION}.sdk.tar.xz" \
         | sha256sum -c - \
     && env UNATTENDED=yes OSX_VERSION_MIN=${OSX_VERSION_MIN} ./build.sh \
-    && rm -rf *~ taballs *.tar.xz \
-    && rm -rf /tmp/* \
+    && true
+
+RUN set -eux \
+    && cd /usr/local/osxcross \
+    && echo "Building osxcross with compiler-rt..." \
+    # compiler-rt can be needed to build code using `__builtin_available()`
+    && env DISABLE_PARALLEL_ARCH_BUILD=1 ./build_compiler_rt.sh \
     && true
 
 ENV PATH $PATH:/usr/local/osxcross/target/bin
+
+RUN set -eux \
+    && echo "Testing osxcross with compiler-rt..." \
+    && echo "int main(void){return 0;}" | xcrun clang -xc -o/dev/null -v - 2>&1 | grep "libclang_rt" 1>/dev/null \
+    && echo "compiler-rt installed and working successfully!" \
+    && true
+
+RUN set -eux \
+    && echo "Removing osxcross temp files..." \
+    && rm -rf *~ taballs *.tar.xz \
+    && rm -rf /tmp/* \
+    && true
 
 WORKDIR /root/src
 
