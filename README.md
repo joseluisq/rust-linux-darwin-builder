@@ -14,7 +14,7 @@
 
 <div align="center">
 
-  [![CI](https://github.com/joseluisq/rust-linux-darwin-builder/workflows/CI/badge.svg)](https://github.com/joseluisq/rust-linux-darwin-builder/actions?query=workflow%3ACI) [![Docker Image Version (tag latest semver)](https://img.shields.io/docker/v/joseluisq/rust-linux-darwin-builder/1)](https://hub.docker.com/r/joseluisq/rust-linux-darwin-builder/) [![Docker Image Size (tag)](https://img.shields.io/docker/image-size/joseluisq/rust-linux-darwin-builder/1)](https://hub.docker.com/r/joseluisq/rust-linux-darwin-builder/tags) [![Docker Image](https://img.shields.io/docker/pulls/joseluisq/rust-linux-darwin-builder.svg)](https://hub.docker.com/r/joseluisq/rust-linux-darwin-builder/)
+  [![devel](https://github.com/joseluisq/rust-linux-darwin-builder/workflows/devel/badge.svg)](https://github.com/joseluisq/rust-linux-darwin-builder/actions?query=workflow%3Adevel) [![Docker Image Version (tag latest semver)](https://img.shields.io/docker/v/joseluisq/rust-linux-darwin-builder/1)](https://hub.docker.com/r/joseluisq/rust-linux-darwin-builder/) [![Docker Image Size (tag)](https://img.shields.io/docker/image-size/joseluisq/rust-linux-darwin-builder/1)](https://hub.docker.com/r/joseluisq/rust-linux-darwin-builder/tags) [![Docker Image](https://img.shields.io/docker/pulls/joseluisq/rust-linux-darwin-builder.svg)](https://hub.docker.com/r/joseluisq/rust-linux-darwin-builder/)
 
 </div>
 
@@ -38,7 +38,7 @@ By default the working directory is `/root/src`.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.60.0 \
+    joseluisq/rust-linux-darwin-builder:1.61.0 \
     sh -c "cargo build --release"
 ```
 
@@ -50,7 +50,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.60.0 \
+    joseluisq/rust-linux-darwin-builder:1.61.0 \
     sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -63,7 +63,7 @@ It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-h
 You can also use the image as a base for your own Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.60.0
+FROM joseluisq/rust-linux-darwin-builder:1.61.0
 ```
 
 ### OSXCross
@@ -80,14 +80,14 @@ Examples:
 ```sh
 Example usage:
 
-Example 1: CC=o32-clang ./configure --host=i386-apple-darwin21.1
-Example 2: CC=i386-apple-darwin21.1-clang ./configure --host=i386-apple-darwin21.1
+Example 1: CC=o32-clang ./configure --host=i386-apple-darwin21.2
+Example 2: CC=i386-apple-darwin21.2-clang ./configure --host=i386-apple-darwin21.2
 Example 3: o64-clang -Wall test.c -o test
-Example 4: x86_64-apple-darwin21.1-strip -x test
+Example 4: x86_64-apple-darwin21.2-strip -x test
 
-!!! Use aarch64-apple-darwin21.1-* instead of arm64-* when dealing with Automake !!!
-!!! CC=aarch64-apple-darwin21.1-clang ./configure --host=aarch64-apple-darwin21.1 !!!
-!!! CC="aarch64-apple-darwin21.1-clang -arch arm64e" ./configure --host=aarch64-apple-darwin21.1 !!!
+!!! Use aarch64-apple-darwin21.2-* instead of arm64-* when dealing with Automake !!!
+!!! CC=aarch64-apple-darwin21.2-clang ./configure --host=aarch64-apple-darwin21.2 !!!
+!!! CC="aarch64-apple-darwin21.2-clang -arch arm64e" ./configure --host=aarch64-apple-darwin21.2 !!!
 ```
 
 ### Cross-compilation example
@@ -106,7 +106,7 @@ compile:
 	@docker run --rm -it \
 		-v $(PWD):/drone/src \
 		-w /drone/src \
-			joseluisq/rust-linux-darwin-builder:1.60.0 \
+			joseluisq/rust-linux-darwin-builder:1.61.0 \
 				make cross-compile
 .PHONY: compile
 
@@ -131,12 +131,12 @@ Just run the makefile `compile` target, then you will see two release binaries `
 make compile
 # 1. Cross compiling example...
 
-# rustc 1.60.0 (7737e0b5c 2022-04-04)
+# rustc 1.61.0 (fe5b13d68 2022-05-18)
 # binary: rustc
-# commit-hash: 7737e0b5c4103216d6fd8cf941b7ab9bdbaace7c
-# commit-date: 2022-04-04
+# commit-hash: fe5b13d681f25ee6474be29d748c65adcd91f69e
+# commit-date: 2022-05-18
 # host: x86_64-unknown-linux-gnu
-# release: 1.60.0
+# release: 1.61.0
 # LLVM version: 14.0.0
 
 # 2. Compiling application (linux-musl x86_64)...

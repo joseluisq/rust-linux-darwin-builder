@@ -18,21 +18,21 @@ ARG TOOLCHAIN=stable
 
 # OpenSSL v1.1.1
 # https://www.openssl.org/source/old/1.1.1/
-ARG OPENSSL_VERSION=1.1.1m
+ARG OPENSSL_VERSION=1.1.1n
 
 # zlib - http://zlib.net/
 ARG ZLIB_VERSION=1.2.12
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=14.2
+ARG POSTGRESQL_VERSION=14.3
 
 # Mac OS X SDK version - https://github.com/joseluisq/macosx-sdks
-ARG OSX_SDK_VERSION=12.0
-ARG OSX_SDK_SUM=ac07f28c09e6a3b09a1c01f1535ee71abe8017beaedd09181c8f08936a510ffd
+ARG OSX_SDK_VERSION=12.1
+ARG OSX_SDK_SUM=a1a6d4340faa7d2744f1fc63b093226da90681288507446b98795a26a6ade4bb
 ARG OSX_VERSION_MIN=10.14
 
 # OS X Cross - https://github.com/tpoechtrager/osxcross
-ARG OSX_CROSS_COMMIT=be2b79f444aa0b43b8695a4fb7b920bf49ecc01c
+ARG OSX_CROSS_COMMIT=610542781e0eabc6968b0c0719bbc8d25c992025
 
 # Make sure we have basic dev tools for building C libraries. Our goal
 # here is to support the musl-libc builds and Cargo builds needed for a

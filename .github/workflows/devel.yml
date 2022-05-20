@@ -1,10 +1,13 @@
-name: CI
-
-on: [push, pull_request]
+name: devel
+on:
+  pull_request:
+  push:
+    branches:
+    - master
 
 jobs:
   docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       -
         name: Checkout
