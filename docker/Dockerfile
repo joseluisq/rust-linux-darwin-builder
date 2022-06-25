@@ -1,5 +1,4 @@
-# NOTE: Most of Dockerfile and related were borrowed from
-#       https://hub.docker.com/r/ekidd/rust-musl-builder
+# NOTE: Most of Dockerfile and related were borrowed from https://hub.docker.com/r/ekidd/rust-musl-builder
 
 FROM debian:11-slim
 
@@ -10,29 +9,27 @@ LABEL version="${VERSION}" \
     description="Use same Docker image for compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
     maintainer="Jose Quintana <joseluisq.net>"
 
-
 # Rust stable toolchain
 ARG TOOLCHAIN=stable
 
 # Dependencies
 
-# OpenSSL v1.1.1
-# https://www.openssl.org/source/old/1.1.1/
-ARG OPENSSL_VERSION=1.1.1n
+# OpenSSL v1.1.1 - https://www.openssl.org/source/old/1.1.1/
+ARG OPENSSL_VERSION=1.1.1o
 
 # zlib - http://zlib.net/
 ARG ZLIB_VERSION=1.2.12
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=14.3
+ARG POSTGRESQL_VERSION=14.4
 
 # Mac OS X SDK version - https://github.com/joseluisq/macosx-sdks
-ARG OSX_SDK_VERSION=12.1
-ARG OSX_SDK_SUM=a1a6d4340faa7d2744f1fc63b093226da90681288507446b98795a26a6ade4bb
+ARG OSX_SDK_VERSION=12.3
+ARG OSX_SDK_SUM=3abd261ceb483c44295a6623fdffe5d44fc4ac2c872526576ec5ab5ad0f6e26c
 ARG OSX_VERSION_MIN=10.14
 
 # OS X Cross - https://github.com/tpoechtrager/osxcross
-ARG OSX_CROSS_COMMIT=610542781e0eabc6968b0c0719bbc8d25c992025
+ARG OSX_CROSS_COMMIT=17bb5e2d0a46533c1dd525cf4e9a80d88bd9f00e
 
 # Make sure we have basic dev tools for building C libraries. Our goal
 # here is to support the musl-libc builds and Cargo builds needed for a

@@ -80,14 +80,14 @@ Examples:
 ```sh
 Example usage:
 
-Example 1: CC=o32-clang ./configure --host=i386-apple-darwin21.2
-Example 2: CC=i386-apple-darwin21.2-clang ./configure --host=i386-apple-darwin21.2
+Example 1: CC=o32-clang ./configure --host=i386-apple-darwin21.4
+Example 2: CC=i386-apple-darwin21.4-clang ./configure --host=i386-apple-darwin21.4
 Example 3: o64-clang -Wall test.c -o test
-Example 4: x86_64-apple-darwin21.2-strip -x test
+Example 4: x86_64-apple-darwin21.4-strip -x test
 
-!!! Use aarch64-apple-darwin21.2-* instead of arm64-* when dealing with Automake !!!
-!!! CC=aarch64-apple-darwin21.2-clang ./configure --host=aarch64-apple-darwin21.2 !!!
-!!! CC="aarch64-apple-darwin21.2-clang -arch arm64e" ./configure --host=aarch64-apple-darwin21.2 !!!
+!!! Use aarch64-apple-darwin21.4-* instead of arm64-* when dealing with Automake !!!
+!!! CC=aarch64-apple-darwin21.4-clang ./configure --host=aarch64-apple-darwin21.4 !!!
+!!! CC="aarch64-apple-darwin21.4-clang -arch arm64e" ./configure --host=aarch64-apple-darwin21.4 !!!
 ```
 
 ### Cross-compilation example
