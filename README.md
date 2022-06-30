@@ -30,7 +30,7 @@ It contains essential tools for cross-compile [Rust](https://www.rust-lang.org/)
 
 ### Compiling an application inside a Docker container
 
-By default the working directory is `/root/src`.
+By default, the working directory is `/root/src`.
 
 #### x86_64-unknown-linux-musl
 
@@ -56,11 +56,11 @@ docker run --rm \
 
 ### Cargo Home advice
 
-It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-home.html#cargo-home) points to `$HOME/.cargo` by default (`/root/.cargo` in this case). However if you want to use a custom Cargo home directory then make sure to copy the Cargo `config` file to the particular directory like `cp "$HOME/.cargo/config" "$CARGO_HOME/"` before to cross-compile your program. Otherwise you could face a linking error when for example you want to cross-compile to an `x86_64-apple-darwin` target.
+It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-home.html#cargo-home) points to `$HOME/.cargo` by default (`/root/.cargo` in this case). However, if you want to use a custom Cargo home directory then make sure to copy the Cargo `config` file to the particular directory like `cp "$HOME/.cargo/config" "$CARGO_HOME/"` before to cross-compile your program. Otherwise, you could face a linking error when for example you want to cross-compile to an `x86_64-apple-darwin` target.
 
 ### Dockerfile
 
-You can also use the image as a base for your own Dockerfile:
+You can also use the image as a base for your Dockerfile:
 
 ```Dockerfile
 FROM joseluisq/rust-linux-darwin-builder:1.61.0
@@ -68,7 +68,7 @@ FROM joseluisq/rust-linux-darwin-builder:1.61.0
 
 ### OSXCross
 
-You can also use o32-clang(++) and o64-clang(++) like a normal compiler.
+You can also use o32-clang(++) and o64-clang(++) as a normal compiler.
 
 __Notes:__
 
@@ -92,12 +92,12 @@ Example 4: x86_64-apple-darwin21.4-strip -x test
 
 ### Cross-compilation example
 
-Below a simple example using a `Makefile` for cross-compiling a Rust app.
+Below is a simple example of using a `Makefile`` for cross-compiling a Rust app.
 
 Notes:
 
 - A [hello world](./tests/hello-world) app is used.
-- A custom directory is used below as working directory instead of `/root/src`.
+- A custom directory is used below as a working directory instead of `/root/src`.
 
 Create a Makefile:
 
@@ -131,13 +131,13 @@ Just run the makefile `compile` target, then you will see two release binaries `
 make compile
 # 1. Cross compiling example...
 
-# rustc 1.61.0 (fe5b13d68 2022-05-18)
+# rustc 1.62.0 (a8314ef7d 2022-06-27)
 # binary: rustc
-# commit-hash: fe5b13d681f25ee6474be29d748c65adcd91f69e
-# commit-date: 2022-05-18
+# commit-hash: a8314ef7d0ec7b75c336af2c9857bfaf43002bfc
+# commit-date: 2022-06-27
 # host: x86_64-unknown-linux-gnu
-# release: 1.61.0
-# LLVM version: 14.0.0
+# release: 1.62.0
+# LLVM version: 14.0.5
 
 # 2. Compiling application (linux-musl x86_64)...
 #     Finished release [optimized] target(s) in 0.01s
@@ -152,7 +152,7 @@ make compile
 
 If some of your crates require C bindings and you run into compilation or linking errors, try to use Clang for C/C++ builds.
 
-For example to cross compile to Macos:
+For example to cross-compile to Macos:
 
 ```sh
 CC=o64-clang \
@@ -160,7 +160,7 @@ CXX=o64-clang++ \
 	cargo build --target x86_64-apple-darwin
 ```
 
-For more details take a look at [Cross compiling Rust from Linux to macOS](https://wapl.es/rust/2019/02/17/rust-cross-compile-linux-to-macos.html) by James Waples.
+For more details take a look at Cross-compiling Rust from Linux to macOS](https://wapl.es/rust/2019/02/17/rust-cross-compile-linux-to-macos.html) by James Waples.
 
 ### OpenSSL release advice
 
