@@ -14,8 +14,8 @@ ARG TOOLCHAIN=stable
 
 # Dependencies
 
-# OpenSSL v1.1.1 - https://www.openssl.org/source/old/1.1.1/
-ARG OPENSSL_VERSION=1.1.1o
+# OpenSSL 1.1.1 - https://www.openssl.org/source/old/1.1.1/
+ARG OPENSSL_VERSION=1.1.1p
 
 # zlib - http://zlib.net/
 ARG ZLIB_VERSION=1.2.12

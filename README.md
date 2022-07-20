@@ -38,7 +38,7 @@ By default, the working directory is `/root/src`.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.61.0 \
+    joseluisq/rust-linux-darwin-builder:1.62.1 \
     sh -c "cargo build --release"
 ```
 
@@ -50,7 +50,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.61.0 \
+    joseluisq/rust-linux-darwin-builder:1.62.1 \
     sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -63,7 +63,7 @@ It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-h
 You can also use the image as a base for your Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.61.0
+FROM joseluisq/rust-linux-darwin-builder:1.62.1
 ```
 
 ### OSXCross
@@ -106,7 +106,7 @@ compile:
 	@docker run --rm -it \
 		-v $(PWD):/drone/src \
 		-w /drone/src \
-			joseluisq/rust-linux-darwin-builder:1.61.0 \
+			joseluisq/rust-linux-darwin-builder:1.62.1 \
 				make cross-compile
 .PHONY: compile
 
@@ -125,18 +125,18 @@ cross-compile:
 .PHONY: cross-compile
 ```
 
-Just run the makefile `compile` target, then you will see two release binaries `x86_64-unknown-linux-musl` and `x86_64-apple-darwin`).
+Just run the makefile `compile` target, then you will see two release binaries `x86_64-unknown-linux-musl` and `x86_64-apple-darwin`.
 
 ```sh
 make compile
 # 1. Cross compiling example...
 
-# rustc 1.62.0 (a8314ef7d 2022-06-27)
+# rustc 1.62.1 (e092d0b6b 2022-07-16)
 # binary: rustc
-# commit-hash: a8314ef7d0ec7b75c336af2c9857bfaf43002bfc
-# commit-date: 2022-06-27
+# commit-hash: e092d0b6b43f2de967af0887873151bb1c0b18d3
+# commit-date: 2022-07-16
 # host: x86_64-unknown-linux-gnu
-# release: 1.62.0
+# release: 1.62.1
 # LLVM version: 14.0.5
 
 # 2. Compiling application (linux-musl x86_64)...
@@ -147,6 +147,12 @@ make compile
 #     Finished release [optimized] target(s) in 0.01s
 # 240K	tests/hello-world/target/x86_64-apple-darwin/release/helloworld
 ```
+
+For more details take a look at [Cross-compiling Rust from Linux to macOS](https://wapl.es/rust/2019/02/17/rust-cross-compile-linux-to-macos.html) by James Waples.
+
+### Macos ARM64
+
+See [joseluisq/rust-linux-darwin-builder#7](https://github.com/joseluisq/rust-linux-darwin-builder/issues/7)
 
 ### Building *-sys crates
 
@@ -159,8 +165,6 @@ CC=o64-clang \
 CXX=o64-clang++ \
 	cargo build --target x86_64-apple-darwin
 ```
-
-For more details take a look at Cross-compiling Rust from Linux to macOS](https://wapl.es/rust/2019/02/17/rust-cross-compile-linux-to-macos.html) by James Waples.
 
 ### OpenSSL release advice
 
