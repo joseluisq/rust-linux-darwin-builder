@@ -37,10 +37,10 @@ test-ci:
 	@rustc -vV
 	@echo
 	@cd tests/hello-world \
-		&& echo "Compiling application (linux-musl x86_64)..." \
-		&& cargo build --release --target x86_64-unknown-linux-musl \
-		&& du -sh target/x86_64-unknown-linux-musl/release/helloworld \
-		&& ./target/x86_64-unknown-linux-musl/release/helloworld \
+		&& echo "Compiling application (linux-musl $$(uname -m))..." \
+		&& cargo build --release --target "$$(uname -m)-unknown-linux-musl" \
+		&& du -sh target/$$(uname -m)-unknown-linux-musl/release/helloworld \
+		&& ./target/$$(uname -m)-unknown-linux-musl/release/helloworld \
 		&& echo \
 		&& echo "Compiling application (apple-darwin x86_64)..." \
 		&& cargo build --release --target x86_64-apple-darwin \

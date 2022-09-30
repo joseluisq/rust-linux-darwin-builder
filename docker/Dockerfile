@@ -91,7 +91,7 @@ ENV PATH=/root/.cargo/bin:/usr/local/musl/bin:/usr/local/sbin:/usr/local/bin:/us
 # `--target` to musl so that our users don't need to keep overriding it manually.
 RUN set -eux \
     && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $TOOLCHAIN \
-    && rustup target add x86_64-unknown-linux-musl \
+    && rustup target add $(uname -m)-unknown-linux-musl \
     && rustup target add armv7-unknown-linux-musleabihf \
     && rustup target add x86_64-apple-darwin \
     && true
@@ -167,9 +167,13 @@ RUN set -eux \
     && true
 
 ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/musl/ \
+    AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/musl/ \
     X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_STATIC=1 \
+    AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_STATIC=1 \
     PQ_LIB_STATIC_X86_64_UNKNOWN_LINUX_MUSL=1 \
+    PQ_LIB_STATIC_AARCH64_UNKNOWN_LINUX_MUSL=1 \
     PG_CONFIG_X86_64_UNKNOWN_LINUX_GNU=/usr/bin/pg_config \
+    PG_CONFIG_AARCH64_UNKNOWN_LINUX_GNU=/usr/bin/pg_config \
     PKG_CONFIG_ALLOW_CROSS=true \
     PKG_CONFIG_ALL_STATIC=true \
     LIBZ_SYS_STATIC=1 \
