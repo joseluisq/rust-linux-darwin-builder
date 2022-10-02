@@ -23,6 +23,7 @@ RUN set -eux \
         cmake \
         curl \
         file \
+        gcc-aarch64-linux-gnu \
         gcc-arm-linux-gnueabihf \
         git \
         libbz2-dev \
@@ -216,6 +217,7 @@ RUN set -eux \
     && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $TOOLCHAIN \
     && rustup target add $(uname -m)-unknown-linux-musl \
     && rustup target add armv7-unknown-linux-musleabihf \
+    && rustup target add aarch64-unknown-linux-gnu \
     && rustup target add x86_64-apple-darwin \
     && rustup target add aarch64-apple-darwin \
     && true
