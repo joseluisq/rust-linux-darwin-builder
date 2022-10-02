@@ -9,28 +9,6 @@ LABEL version="${VERSION}" \
     description="Use same Docker image for compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
     maintainer="Jose Quintana <joseluisq.net>"
 
-# Rust stable toolchain
-ARG TOOLCHAIN=stable
-
-# Dependencies
-
-# OpenSSL 1.1.1 - https://www.openssl.org/source/old/1.1.1/
-ARG OPENSSL_VERSION=1.1.1p
-
-# zlib - http://zlib.net/
-ARG ZLIB_VERSION=1.2.12
-
-# libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=14.5
-
-# Mac OS X SDK version - https://github.com/joseluisq/macosx-sdks
-ARG OSX_SDK_VERSION=12.3
-ARG OSX_SDK_SUM=3abd261ceb483c44295a6623fdffe5d44fc4ac2c872526576ec5ab5ad0f6e26c
-ARG OSX_VERSION_MIN=10.14
-
-# OS X Cross - https://github.com/tpoechtrager/osxcross
-ARG OSX_CROSS_COMMIT=50e86ebca7d14372febd0af8cd098705049161b9
-
 # Make sure we have basic dev tools for building C libraries. Our goal
 # here is to support the musl-libc builds and Cargo builds needed for a
 # large selection of the most popular crates.
@@ -85,28 +63,19 @@ RUN set -eux \
 # musl-gcc toolchain and for our Rust toolchain.
 ENV PATH=/root/.cargo/bin:/usr/local/musl/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-# Install our Rust toolchain and the `musl` target. We patch the
-# command-line we pass to the installer so that it won't attempt to
-# interact with the user or fool around with TTYs. We also set the default
-# `--target` to musl so that our users don't need to keep overriding it manually.
-RUN set -eux \
-    && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $TOOLCHAIN \
-    && rustup target add $(uname -m)-unknown-linux-musl \
-    && rustup target add armv7-unknown-linux-musleabihf \
-    && rustup target add x86_64-apple-darwin \
-    && true
-ADD docker/cargo-config.toml /root/.cargo/config
-
 # Set up a `git credentials` helper for using GH_USER and GH_TOKEN to access
 # private repositories if desired.
-ADD docker/git-credential-ghtoken /usr/local/bin
+COPY docker/git-credential-ghtoken /usr/local/bin
 RUN set -eux \
     && git config --global credential.https://github.com.helper ghtoken \
     && true
 
 # Build a static library version of OpenSSL using musl-libc. This is needed by
 # the popular Rust `hyper` crate.
-#
+
+# OpenSSL 1.1.1 - https://www.openssl.org/source/old/1.1.1/
+ARG OPENSSL_VERSION=1.1.1p
+
 # We point /usr/local/musl/include/linux at some Linux kernel headers (not
 # necessarily the right ones) in an effort to compile OpenSSL 1.1's "engine"
 # component. It's possible that this will cause bizarre and terrible things to
@@ -138,6 +107,10 @@ RUN set -eux \
     && rm -r /tmp/* \
     && true
 
+
+# zlib - http://zlib.net/
+ARG ZLIB_VERSION=1.2.12
+
 RUN set -eux \
     && echo "Building zlib ${ZLIB_VERSION}..." \
     && cd /tmp \
@@ -149,6 +122,10 @@ RUN set -eux \
     && make -j$(nproc) install \
     && rm -r /tmp/* \
     && true
+
+
+# libpq - https://ftp.postgresql.org/pub/source/
+ARG POSTGRESQL_VERSION=14.5
 
 RUN set -eux \
     && echo "Building libpq ${POSTGRESQL_VERSION}..." \
@@ -184,9 +161,16 @@ ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/musl/ \
 # everybody needing to build them manually.)
 
 
+# Mac OS X SDK version - https://github.com/joseluisq/macosx-sdks
+ARG OSX_SDK_VERSION=12.3
+ARG OSX_SDK_SUM=3abd261ceb483c44295a6623fdffe5d44fc4ac2c872526576ec5ab5ad0f6e26c
+ARG OSX_VERSION_MIN=10.14
+
+# OS X Cross - https://github.com/tpoechtrager/osxcross
+ARG OSX_CROSS_COMMIT=50e86ebca7d14372febd0af8cd098705049161b9
+
 # Install OS X Cross
 # A Mac OS X cross toolchain for Linux, FreeBSD, OpenBSD and Android
-
 RUN set -eux \
     && echo "Cloning osxcross..." \
     && git clone https://github.com/tpoechtrager/osxcross.git /usr/local/osxcross \
@@ -220,8 +204,25 @@ RUN set -eux \
     && echo "compiler-rt installed and working successfully!" \
     && true
 
+
+# Rust stable toolchain
+ARG TOOLCHAIN=stable
+
+# Install our Rust toolchain and the `musl` target. We patch the
+# command-line we pass to the installer so that it won't attempt to
+# interact with the user or fool around with TTYs. We also set the default
+# `--target` to musl so that our users don't need to keep overriding it manually.
 RUN set -eux \
-    && echo "Removing osxcross temp files..." \
+    && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $TOOLCHAIN \
+    && rustup target add $(uname -m)-unknown-linux-musl \
+    && rustup target add armv7-unknown-linux-musleabihf \
+    && rustup target add x86_64-apple-darwin \
+    && rustup target add aarch64-apple-darwin \
+    && true
+COPY docker/cargo-config.toml /root/.cargo/config
+
+RUN set -eux \
+    && echo "Removing temp files..." \
     && rm -rf *~ taballs *.tar.xz \
     && rm -rf /tmp/* \
     && true
