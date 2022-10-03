@@ -94,6 +94,7 @@ RUN set -eux \
     && rustup target add $(uname -m)-unknown-linux-musl \
     && rustup target add armv7-unknown-linux-musleabihf \
     && rustup target add x86_64-apple-darwin \
+    && rustup target add aarch64-apple-darwin \
     && true
 ADD docker/cargo-config.toml /root/.cargo/config
 

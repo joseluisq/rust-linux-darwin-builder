@@ -44,7 +44,12 @@ test-ci:
 		&& echo \
 		&& echo "Compiling application (apple-darwin x86_64)..." \
 		&& cargo build --release --target x86_64-apple-darwin \
-		&& du -sh target/x86_64-apple-darwin/release/helloworld
+		&& du -sh target/x86_64-apple-darwin/release/helloworld \
+		&& echo \
+		&& echo "Compiling application (apple-darwin aarch64)..." \
+                && cargo build --release --target aarch64-apple-darwin \
+                && du -sh target/aarch64-apple-darwin/release/helloworld
+
 .ONESHELL: test-ci
 
 promote:
