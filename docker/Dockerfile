@@ -91,9 +91,10 @@ ENV PATH=/root/.cargo/bin:/usr/local/musl/bin:/usr/local/sbin:/usr/local/bin:/us
 # `--target` to musl so that our users don't need to keep overriding it manually.
 RUN set -eux \
     && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $TOOLCHAIN \
-    && rustup target add x86_64-unknown-linux-musl \
+    && rustup target add $(uname -m)-unknown-linux-musl \
     && rustup target add armv7-unknown-linux-musleabihf \
     && rustup target add x86_64-apple-darwin \
+    && rustup target add aarch64-apple-darwin \
     && true
 ADD docker/cargo-config.toml /root/.cargo/config
 
@@ -112,17 +113,23 @@ RUN set -eux \
 # component. It's possible that this will cause bizarre and terrible things to
 # happen. There may be "sanitized" header
 RUN set -eux \
+    && dpkgArch="$(dpkg --print-architecture)" \
+    && case "${dpkgArch##*-}" in \
+        amd64) config='';; \
+        arm64) config='-mno-outline-atomics';; \
+        *) echo >&2 "unsupported architecture: ${dpkgArch}"; exit 1 ;; \
+    esac \
     && echo "Building OpenSSL ${OPENSSL_VERSION}..." \
     && ls /usr/include/linux \
     && mkdir -p /usr/local/musl/include \
     && ln -s /usr/include/linux /usr/local/musl/include/linux \
-    && ln -s /usr/include/x86_64-linux-gnu/asm /usr/local/musl/include/asm \
+    && ln -s "/usr/include/$(uname -m)-linux-gnu/asm" /usr/local/musl/include/asm \
     && ln -s /usr/include/asm-generic /usr/local/musl/include/asm-generic \
     && cd /tmp \
     && curl -LO "https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz" \
     && tar xvzf "openssl-${OPENSSL_VERSION}.tar.gz" \
     && cd "openssl-${OPENSSL_VERSION}" \
-    && env CC=musl-gcc ./Configure no-shared no-zlib -fPIC --prefix=/usr/local/musl -DOPENSSL_NO_SECURE_MEMORY linux-x86_64 \
+    && env CC=musl-gcc ./Configure no-shared no-zlib -fPIC --prefix=/usr/local/musl -DOPENSSL_NO_SECURE_MEMORY ${config} "linux-$(uname -m)" \
     && env C_INCLUDE_PATH=/usr/local/musl/include/ make depend \
     && env C_INCLUDE_PATH=/usr/local/musl/include/ make -j$(nproc) \
     && make -j$(nproc) install_sw \
@@ -161,9 +168,13 @@ RUN set -eux \
     && true
 
 ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/musl/ \
+    AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/musl/ \
     X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_STATIC=1 \
+    AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_STATIC=1 \
     PQ_LIB_STATIC_X86_64_UNKNOWN_LINUX_MUSL=1 \
+    PQ_LIB_STATIC_AARCH64_UNKNOWN_LINUX_MUSL=1 \
     PG_CONFIG_X86_64_UNKNOWN_LINUX_GNU=/usr/bin/pg_config \
+    PG_CONFIG_AARCH64_UNKNOWN_LINUX_GNU=/usr/bin/pg_config \
     PKG_CONFIG_ALLOW_CROSS=true \
     PKG_CONFIG_ALL_STATIC=true \
     LIBZ_SYS_STATIC=1 \
