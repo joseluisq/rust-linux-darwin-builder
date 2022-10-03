@@ -42,10 +42,12 @@ test-ci:
 		&& du -sh target/$$(uname -m)-unknown-linux-musl/release/helloworld \
 		&& ./target/$$(uname -m)-unknown-linux-musl/release/helloworld \
 		&& echo \
+\
 		&& echo "Compiling application (apple-darwin x86_64)..." \
 		&& cargo build --release --target x86_64-apple-darwin \
 		&& du -sh target/x86_64-apple-darwin/release/helloworld \
 		&& echo \
+\
 		&& echo "Compiling application (apple-darwin aarch64)..." \
                 && cargo build --release --target aarch64-apple-darwin \
                 && du -sh target/aarch64-apple-darwin/release/helloworld

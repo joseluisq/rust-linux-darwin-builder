@@ -215,12 +215,13 @@ ARG TOOLCHAIN=stable
 # `--target` to musl so that our users don't need to keep overriding it manually.
 RUN set -eux \
     && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $TOOLCHAIN \
-    && rustup target add x86_64-unknown-linux-musl \
-    && rustup target add aarch64-unknown-linux-musl \
-    && rustup target add armv7-unknown-linux-musleabihf \
-    && rustup target add aarch64-unknown-linux-gnu \
-    && rustup target add x86_64-apple-darwin \
-    && rustup target add aarch64-apple-darwin \
+    && rustup target add \
+        aarch64-apple-darwin \
+        aarch64-unknown-linux-gnu \
+        aarch64-unknown-linux-musl \
+        armv7-unknown-linux-musleabihf \
+        x86_64-apple-darwin \
+        x86_64-unknown-linux-musl \
     && true
 COPY docker/cargo-config.toml /root/.cargo/config
 
