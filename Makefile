@@ -29,14 +29,14 @@ test:
 		-v $(PWD):/root/src \
 		-w /root/src \
 			$(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
-				set -eu; make test-ci
+				bash -c 'set -eu; make test-ci'
 .PHONY: test
 
 test-ci:
-	echo "Testing cross-compiling application..."
-	rustc -vV
-	echo
-	cd tests/hello-world \
+	@echo "Testing cross-compiling application..."
+	@rustc -vV
+	@echo
+	@cd tests/hello-world \
 \
 		&& if [ "$$(uname -m)" = "x86_64" ]; then \
 			echo "Compiling application (linux-gnu x86_64)..."; \

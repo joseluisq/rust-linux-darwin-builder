@@ -25,6 +25,7 @@ RUN set -eux \
         file \
         gcc-aarch64-linux-gnu \
         gcc-arm-linux-gnueabihf \
+        g++-aarch64-linux-gnu \
         git \
         libbz2-dev \
         libgmp-dev \
