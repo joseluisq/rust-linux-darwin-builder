@@ -37,5 +37,5 @@ jobs:
         with:
           push: true
           context: .
-          file: docker/Dockerfile
+          file: Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
