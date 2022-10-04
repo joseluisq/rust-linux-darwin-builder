@@ -16,7 +16,7 @@ jobs:
         name: Cache Docker layers
         uses: mattes/cached-docker-build-action@v1
         with:
-          args: "-t joseluisq/rust-linux-darwin-builder:latest -f docker/Dockerfile ."
+          args: "-t joseluisq/rust-linux-darwin-builder:latest -f Dockerfile ."
           cache_key: "${{ hashFiles('**/lockfiles') }}"
       -
         name: Test cross-compile

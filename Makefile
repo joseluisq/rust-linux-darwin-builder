@@ -5,7 +5,7 @@ TAG ?= latest
 build:
 	docker build \
 		-t $(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
-		-f docker/Dockerfile .
+		-f Dockerfile .
 .PHONY: build
 
 
@@ -20,7 +20,7 @@ buildx:
 		--platform linux/amd64,linux/arm64 \
 		--push \
 		-t $(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
-		-f docker/Dockerfile .
+		-f Dockerfile .
 
 .PHONY: buildx
 
@@ -79,7 +79,3 @@ test-ci:
 		&& du -sh target/aarch64-apple-darwin/release/helloworld
 
 .ONESHELL: test-ci
-
-promote:
-	@drone build promote joseluisq/rust-linux-darwin-builder $(BUILD) $(ENV)
-.PHONY: promote

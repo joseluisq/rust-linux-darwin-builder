@@ -67,7 +67,7 @@ ENV PATH=/root/.cargo/bin:/usr/local/musl/bin:/usr/local/sbin:/usr/local/bin:/us
 
 # Set up a `git credentials` helper for using GH_USER and GH_TOKEN to access
 # private repositories if desired.
-COPY docker/git-credential-ghtoken /usr/local/bin
+COPY scripts/git-credential-ghtoken /usr/local/bin
 RUN set -eux \
     && git config --global credential.https://github.com.helper ghtoken \
     && true
@@ -224,7 +224,7 @@ RUN set -eux \
         x86_64-apple-darwin \
         x86_64-unknown-linux-musl \
     && true
-COPY docker/cargo-config.toml /root/.cargo/config
+COPY cargo/config.toml /root/.cargo/config
 
 RUN set -eux \
     && echo "Removing temp files..." \
