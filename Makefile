@@ -26,10 +26,10 @@ buildx:
 
 test:
 	@docker run --rm -it \
-		-v $(PWD):/drone/src \
-		-w /drone/src \
+		-v $(PWD):/root/src \
+		-w /root/src \
 			$(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
-				make test-ci
+				bash -c 'set -eu; make test-ci'
 .PHONY: test
 
 test-ci:
@@ -37,18 +37,46 @@ test-ci:
 	@rustc -vV
 	@echo
 	@cd tests/hello-world \
-		&& echo "Compiling application (linux-musl $$(uname -m))..." \
-		&& cargo build --release --target "$$(uname -m)-unknown-linux-musl" \
-		&& du -sh target/$$(uname -m)-unknown-linux-musl/release/helloworld \
-		&& ./target/$$(uname -m)-unknown-linux-musl/release/helloworld \
-		&& echo \
-		&& echo "Compiling application (apple-darwin x86_64)..." \
+\
+		&& if [ "$$(uname -m)" = "x86_64" ]; then \
+			echo "Compiling application (linux-gnu x86_64)..."; \
+			cargo build --release --target x86_64-unknown-linux-gnu; \
+			du -sh target/x86_64-unknown-linux-gnu/release/helloworld; \
+			target/x86_64-unknown-linux-gnu/release/helloworld; \
+			echo; \
+\
+			echo "Compiling application (linux-musl x86_64)..."; \
+			cargo build --release --target x86_64-unknown-linux-musl; \
+			du -sh target/x86_64-unknown-linux-musl/release/helloworld; \
+			target/x86_64-unknown-linux-musl/release/helloworld; \
+			echo; \
+		fi \
+\
+		&& echo "Cross-compiling application (apple-darwin x86_64)..." \
 		&& cargo build --release --target x86_64-apple-darwin \
 		&& du -sh target/x86_64-apple-darwin/release/helloworld \
 		&& echo \
-		&& echo "Compiling application (apple-darwin aarch64)..." \
-                && cargo build --release --target aarch64-apple-darwin \
-                && du -sh target/aarch64-apple-darwin/release/helloworld
+\
+\
+		&& echo "Cross-compiling application (linux-gnu aarch64)..." \
+		&& cargo build --release --target aarch64-unknown-linux-gnu \
+		&& du -sh target/aarch64-unknown-linux-gnu/release/helloworld \
+		&& if [ "$$(uname -m)" = "aarch64" ]; then \
+			target/aarch64-unknown-linux-gnu/release/helloworld; \
+		fi \
+		&& echo \
+\
+		&& echo "Cross-compiling application (linux-musl aarch64)..." \
+		&& cargo build --release --target aarch64-unknown-linux-musl \
+		&& du -sh target/aarch64-unknown-linux-musl/release/helloworld \
+		&& if [ "$$(uname -m)" = "aarch64" ]; then \
+			target/aarch64-unknown-linux-musl/release/helloworld; \
+		fi \
+		&& echo \
+\
+		&& echo "Cross-compiling application (apple-darwin aarch64)..." \
+		&& cargo build --release --target aarch64-apple-darwin \
+		&& du -sh target/aarch64-apple-darwin/release/helloworld
 
 .ONESHELL: test-ci
 
