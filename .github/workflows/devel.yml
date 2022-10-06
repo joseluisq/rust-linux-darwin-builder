@@ -5,25 +5,120 @@ on:
     branches:
     - master
 
+env:
+  DOCKER_IMAGE: localhost:5000/joseluisq/rust-linux-darwin-builder
+
 jobs:
   docker:
+    name: Docker test
+    strategy:
+      matrix:
+        arch:
+          - linux/amd64
+          # NOTE: temporarily disabled until
+          # see https://github.com/joseluisq/rust-linux-darwin-builder/pull/16#issuecomment-1267948972
+          # - linux/arm64
     runs-on: ubuntu-20.04
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
       -
         name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
       -
         name: Cache Docker layers
-        uses: mattes/cached-docker-build-action@v1
+        uses: actions/cache@v2
         with:
-          args: "-t joseluisq/rust-linux-darwin-builder:latest -f Dockerfile ."
-          cache_key: "${{ hashFiles('**/lockfiles') }}"
+          path: /tmp/.buildx-cache
+          key: rust-linux-darwin-builder-${{ matrix.arch }}-buildx-${{ github.sha }}
+          restore-keys: |
+            rust-linux-darwin-builder-${{ matrix.arch }}-buildx-
       -
-        name: Test cross-compile
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Docker meta
+        id: meta_id
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.DOCKER_IMAGE }}
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver-opts: network=host
+      -
+        name: Prepare Docker envs
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          scripts/get-latest-release
+          cat /tmp/version >> $GITHUB_ENV
+          cat /tmp/version
+      -
+        name: Build and export to Docker client
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: ${{ matrix.arch }}
+          file: Dockerfile
+          load: true
+          tags: ${{ steps.meta_id.outputs.tags }}
+          labels: ${{ steps.meta_id.outputs.labels }}
+          build-args: |
+            VERSION=${{ env.VERSION }}
+      -
+        name: Build and push to local registry
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: ${{ matrix.arch }}
+          file: Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta_id.outputs.tags }}
+          labels: ${{ steps.meta_id.outputs.labels }}
+          build-args: |
+            VERSION=${{ env.VERSION }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+      -
+        name: Inspect image
+        run: |
+          docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta_id.outputs.version }}
+      -
+        name: Check manifest
+        if: github.event_name != 'pull_request'
+        run: |
+          docker buildx imagetools inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta_id.outputs.version }}
+      -
+        # Temp fix
+        # https://github.com/docker/build-push-action/issues/252
+        # https://github.com/moby/buildkit/issues/1896
+        name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+      -
+        name: Test cross-compiling
         uses: addnab/docker-run-action@v1
         with:
-          image: joseluisq/rust-linux-darwin-builder:latest
+          image: ${{ env.DOCKER_IMAGE }}:${{ steps.meta_id.outputs.version }}
           options: -v ${{ github.workspace }}:/root/src
           shell: bash
           run: |
+            set -eu
             make test-ci
