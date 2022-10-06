@@ -15,7 +15,9 @@ jobs:
       matrix:
         arch:
           - linux/amd64
-          - linux/arm64
+          # NOTE: temporarily disabled until
+          # see https://github.com/joseluisq/rust-linux-darwin-builder/pull/16#issuecomment-1267948972
+          # - linux/arm64
     runs-on: ubuntu-20.04
     services:
       registry:
