@@ -111,7 +111,7 @@ RUN set -eux \
 
 
 # zlib - http://zlib.net/
-ARG ZLIB_VERSION=1.2.12
+ARG ZLIB_VERSION=1.2.13
 
 RUN set -eux \
     && echo "Building zlib ${ZLIB_VERSION}..." \
