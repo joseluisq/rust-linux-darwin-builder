@@ -1,0 +1,24 @@
+task:
+  only_if: $CIRRUS_TAG == ''
+  timeout_in: 120m
+  matrix:
+    - name: linux-amd64
+      compute_engine_instance:
+        image_project: cirrus-images
+        image: family/docker-builder
+        platform: linux
+        cpu: 8
+        memory: 8G
+
+    - name: linux-arm64
+      compute_engine_instance:
+        image_project: cirrus-images
+        image: family/docker-builder-arm64
+        architecture: arm64
+        platform: linux
+        cpu: 4
+        memory: 4G
+
+  script:
+    - docker build -t joseluisq/rust-linux-darwin-builder:latest -f Dockerfile .
+    - docker run --rm -v $PWD:/root/src joseluisq/rust-linux-darwin-builder:latest bash -c 'set -eu; make test-ci'
