@@ -25,7 +25,7 @@ buildx:
 .PHONY: buildx
 
 test:
-	@docker run --rm -it \
+	@docker run --rm \
 		-v $(PWD):/root/src \
 		-w /root/src \
 			$(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
