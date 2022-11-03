@@ -19,6 +19,63 @@ task:
         cpu: 4
         memory: 4G
 
-  script:
-    - docker build -t joseluisq/rust-linux-darwin-builder:latest -f Dockerfile .
-    - docker run --rm -v $PWD:/root/src joseluisq/rust-linux-darwin-builder:latest bash -c 'set -eu; make test-ci'
+  build_script: make build
+  run_script: make test
+
+task:
+  only_if: $CIRRUS_TAG != ''
+  alias: build-linux-image
+  timeout_in: 120m
+  env:
+    DOCKER_USERNAME: ENCRYPTED[db65fd6fc1af68040964a27c82f2cbd202c849199038cfddc961a573d803a4f2793ba30eede0b6bcdb6bbf29f5c4f012]
+    DOCKER_PASSWORD: ENCRYPTED[c201154ee561b3ca486047160db1c2ae77f766abf880feb5f57a10201374ba661ec7a796928ca8eb3a92aa007c684c37]
+  matrix:
+    - name: linux-amd64
+      env:
+        CIRRUS_ARCH: amd64
+      compute_engine_instance:
+        image_project: cirrus-images
+        image: family/docker-builder
+        platform: linux
+        cpu: 8
+        memory: 8G
+
+    - name: linux-arm64
+      env:
+        CIRRUS_ARCH: arm64
+      compute_engine_instance:
+        image_project: cirrus-images
+        image: family/docker-builder-arm64
+        architecture: arm64
+        platform: linux
+        cpu: 4
+        memory: 4G
+
+  build_script: TAG=$CIRRUS_ARCH make build
+  login_script: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+  push_script: docker push joseluisq/rust-linux-darwin-builder:$CIRRUS_ARCH
+
+release_docker_builder:
+  only_if: $CIRRUS_TAG != ''
+  depends_on:
+    - build-linux-image
+  env:
+    DOCKER_USERNAME: ENCRYPTED[db65fd6fc1af68040964a27c82f2cbd202c849199038cfddc961a573d803a4f2793ba30eede0b6bcdb6bbf29f5c4f012]
+    DOCKER_PASSWORD: ENCRYPTED[c201154ee561b3ca486047160db1c2ae77f766abf880feb5f57a10201374ba661ec7a796928ca8eb3a92aa007c684c37]
+  login_script: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+  manifests_script: |
+    docker manifest create \
+      joseluisq/rust-linux-darwin-builder:latest \
+        --amend joseluisq/rust-linux-darwin-builder:amd64 \
+        --amend joseluisq/rust-linux-darwin-builder:arm64
+  push_manifest_script: docker manifest push joseluisq/rust-linux-darwin-builder:latest
+  push_aliases_script: |
+    SEMVER=${CIRRUS_TAG##*v}
+    SEMVER_MAJOR=${SEMVER%.*.*}
+    SEMVER_MINOR=${SEMVER%.*}
+    docker tag joseluisq/rust-linux-darwin-builder:latest joseluisq/rust-linux-darwin-builder:${SEMVER}
+    docker tag joseluisq/rust-linux-darwin-builder:${SEMVER} joseluisq/rust-linux-darwin-builder:${SEMVER_MAJOR}
+    docker tag joseluisq/rust-linux-darwin-builder:${SEMVER} joseluisq/rust-linux-darwin-builder:${SEMVER_MINOR}
+    docker push joseluisq/rust-linux-darwin-builder:${SEMVER}
+    docker push joseluisq/rust-linux-darwin-builder:${SEMVER_MAJOR}
+    docker push joseluisq/rust-linux-darwin-builder:${SEMVER_MINOR}
