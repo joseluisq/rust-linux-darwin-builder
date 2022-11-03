@@ -69,3 +69,13 @@ release_docker_builder:
         --amend joseluisq/rust-linux-darwin-builder:amd64 \
         --amend joseluisq/rust-linux-darwin-builder:arm64
   push_manifest_script: docker manifest push joseluisq/rust-linux-darwin-builder:latest
+  push_aliases_script: |
+    SEMVER=${CIRRUS_TAG##*v}
+    SEMVER_MAJOR=${SEMVER%.*.*}
+    SEMVER_MINOR=${SEMVER%.*}
+    docker tag joseluisq/rust-linux-darwin-builder:latest joseluisq/rust-linux-darwin-builder:${SEMVER}
+    docker tag joseluisq/rust-linux-darwin-builder:${SEMVER} joseluisq/rust-linux-darwin-builder:${SEMVER_MAJOR}
+    docker tag joseluisq/rust-linux-darwin-builder:${SEMVER} joseluisq/rust-linux-darwin-builder:${SEMVER_MINOR}
+    docker push joseluisq/rust-linux-darwin-builder:${SEMVER}
+    docker push joseluisq/rust-linux-darwin-builder:${SEMVER_MAJOR}
+    docker push joseluisq/rust-linux-darwin-builder:${SEMVER_MINOR}
