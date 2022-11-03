@@ -26,11 +26,18 @@ This is a __Linux Docker image__ based on [ekidd/rust-musl-builder](https://hub.
 
 It contains essential tools for cross-compile [Rust](https://www.rust-lang.org/) projects such as __Linux__ static binaries via [musl-libc / musl-gcc](https://doc.rust-lang.org/edition-guide/rust-2018/platform-and-target-support/musl-support-for-fully-static-binaries.html) (`x86_64-unknown-linux-musl`) and __macOS__ binaries (`x86_64-apple-darwin`) via [osxcross](https://github.com/tpoechtrager/osxcross) just using the same Linux image.
 
+The Docker image is [multi-arch](https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/) (`amd64` and `arm64`) so you can use them in native environments.
+Also, it is possible to cross-compile Linux or Darwin apps to `arm64` from the `x86_64` Docker image variant.
+
 ## Usage
 
 ### Compiling an application inside a Docker container
 
 By default, the working directory is `/root/src`.
+
+### x86_64 (amd64)
+
+Below are the default toolchains included in the Docker image.
 
 #### x86_64-unknown-linux-musl
 
@@ -38,11 +45,19 @@ By default, the working directory is `/root/src`.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.64.0 \
-    sh -c "cargo build --release"
+      joseluisq/rust-linux-darwin-builder:1.65.0 \
+        sh -c "cargo build --release --target x86_64-unknown-linux-musl"
 ```
 
-*Note that `x86_64-unknown-linux-gnu` is also available.*
+#### x86_64-unknown-linux-gnu
+
+```sh
+docker run --rm \
+    --volume "${PWD}/sample":/root/src \
+    --workdir /root/src \
+      joseluisq/rust-linux-darwin-builder:1.65.0 \
+        sh -c "cargo build --release --target x86_64-unknown-linux-gnu"
+```
 
 #### x86_64-apple-darwin
 
@@ -50,8 +65,40 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-    joseluisq/rust-linux-darwin-builder:1.64.0 \
-    sh -c "cargo build --release --target x86_64-apple-darwin"
+      joseluisq/rust-linux-darwin-builder:1.65.0 \
+        sh -c "cargo build --release --target x86_64-apple-darwin"
+```
+
+### aarch64 (arm64)
+
+#### aarch64-unknown-linux-gnu
+
+```sh
+docker run --rm \
+    --volume "${PWD}/sample":/root/src \
+    --workdir /root/src \
+      joseluisq/rust-linux-darwin-builder:1.65.0 \
+        sh -c "cargo build --release --target aarch64-unknown-linux-gnu"
+```
+
+#### aarch64-unknown-linux-musl
+
+```sh
+docker run --rm \
+    --volume "${PWD}/sample":/root/src \
+    --workdir /root/src \
+      joseluisq/rust-linux-darwin-builder:1.65.0 \
+        sh -c "cargo build --release --target aarch64-unknown-linux-musl"
+```
+
+#### aarch64-apple-darwin
+
+```sh
+docker run --rm \
+    --volume "${PWD}/sample":/root/src \
+    --workdir /root/src \
+      joseluisq/rust-linux-darwin-builder:1.65.0 \
+        sh -c "cargo build --release --target aarch64-apple-darwin"
 ```
 
 ### Cargo Home advice
@@ -63,7 +110,7 @@ It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-h
 You can also use the image as a base for your Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.64.0
+FROM joseluisq/rust-linux-darwin-builder:1.65.0
 ```
 
 ### OSXCross
@@ -106,7 +153,7 @@ compile:
 	@docker run --rm -it \
 		-v $(PWD):/drone/src \
 		-w /drone/src \
-			joseluisq/rust-linux-darwin-builder:1.64.0 \
+			joseluisq/rust-linux-darwin-builder:1.65.0 \
 				make cross-compile
 .PHONY: compile
 
@@ -131,13 +178,13 @@ Just run the makefile `compile` target, then you will see two release binaries `
 make compile
 # 1. Cross compiling example...
 
-# rustc 1.64.0 (a55dd71d5 2022-09-19)
+# rustc 1.65.0 (897e37553 2022-11-02)
 # binary: rustc
-# commit-hash: a55dd71d5fb0ec5a6a3a9e8c27b2127ba491ce52
-# commit-date: 2022-09-19
+# commit-hash: 897e37553bba8b42751c67658967889d11ecd120
+# commit-date: 2022-11-02
 # host: x86_64-unknown-linux-gnu
-# release: 1.64.0
-# LLVM version: 14.0.6
+# release: 1.65.0
+# LLVM version: 15.0.0
 
 # 2. Compiling application (linux-musl x86_64)...
 #     Finished release [optimized] target(s) in 0.01s
