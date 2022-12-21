@@ -33,6 +33,9 @@ test:
 .PHONY: test
 
 test-ci:
+	@echo "Checking Debian version..."
+	@cat /etc/debian_version
+	@echo
 	@echo "Testing cross-compiling application..."
 	@rustc -vV
 	@echo

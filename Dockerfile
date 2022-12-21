@@ -76,7 +76,7 @@ RUN set -eux \
 # the popular Rust `hyper` crate.
 
 # OpenSSL 1.1.1 - https://www.openssl.org/source/old/1.1.1/
-ARG OPENSSL_VERSION=1.1.1p
+ARG OPENSSL_VERSION=1.1.1q
 
 # We point /usr/local/musl/include/linux at some Linux kernel headers (not
 # necessarily the right ones) in an effort to compile OpenSSL 1.1's "engine"
@@ -127,7 +127,7 @@ RUN set -eux \
 
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=14.5
+ARG POSTGRESQL_VERSION=15.1
 
 RUN set -eux \
     && echo "Building libpq ${POSTGRESQL_VERSION}..." \
