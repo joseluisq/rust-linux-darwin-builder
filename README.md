@@ -27,7 +27,7 @@ This is a __Linux Docker image__ based on [ekidd/rust-musl-builder](https://hub.
 It contains essential tools for cross-compile [Rust](https://www.rust-lang.org/) projects such as __Linux__ static binaries via [musl-libc / musl-gcc](https://doc.rust-lang.org/edition-guide/rust-2018/platform-and-target-support/musl-support-for-fully-static-binaries.html) (`x86_64-unknown-linux-musl`) and __macOS__ binaries (`x86_64-apple-darwin`) via [osxcross](https://github.com/tpoechtrager/osxcross) just using the same Linux image.
 
 The Docker image is [multi-arch](https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/) (`amd64` and `arm64`) so you can use them in native environments.
-Also, it is possible to cross-compile Linux or Darwin apps to `arm64` from the `x86_64` Docker image variant.
+Also, it is possible to cross-compile `arm64` Linux or Darwin apps from the `x86_64` Docker image variant.
 
 ## Usage
 
@@ -45,7 +45,7 @@ Below are the default toolchains included in the Docker image.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.65.0 \
+      joseluisq/rust-linux-darwin-builder:1.66.1 \
         sh -c "cargo build --release --target x86_64-unknown-linux-musl"
 ```
 
@@ -55,7 +55,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.65.0 \
+      joseluisq/rust-linux-darwin-builder:1.66.1 \
         sh -c "cargo build --release --target x86_64-unknown-linux-gnu"
 ```
 
@@ -65,7 +65,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.65.0 \
+      joseluisq/rust-linux-darwin-builder:1.66.1 \
         sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -77,7 +77,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.65.0 \
+      joseluisq/rust-linux-darwin-builder:1.66.1 \
         sh -c "cargo build --release --target aarch64-unknown-linux-gnu"
 ```
 
@@ -87,7 +87,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.65.0 \
+      joseluisq/rust-linux-darwin-builder:1.66.1 \
         sh -c "cargo build --release --target aarch64-unknown-linux-musl"
 ```
 
@@ -97,7 +97,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.65.0 \
+      joseluisq/rust-linux-darwin-builder:1.66.1 \
         sh -c "cargo build --release --target aarch64-apple-darwin"
 ```
 
@@ -110,7 +110,7 @@ It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-h
 You can also use the image as a base for your Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.65.0
+FROM joseluisq/rust-linux-darwin-builder:1.66.1
 ```
 
 ### OSXCross
@@ -139,7 +139,7 @@ Example 4: x86_64-apple-darwin21.4-strip -x test
 
 ### Cross-compilation example
 
-Below is a simple example of using a `Makefile`` for cross-compiling a Rust app.
+Below is a simple example of using a `Makefile` to cross-compile a Rust app.
 
 Notes:
 
@@ -153,7 +153,7 @@ compile:
 	@docker run --rm -it \
 		-v $(PWD):/drone/src \
 		-w /drone/src \
-			joseluisq/rust-linux-darwin-builder:1.65.0 \
+			joseluisq/rust-linux-darwin-builder:1.66.1 \
 				make cross-compile
 .PHONY: compile
 
@@ -178,13 +178,13 @@ Just run the makefile `compile` target, then you will see two release binaries `
 make compile
 # 1. Cross compiling example...
 
-# rustc 1.65.0 (897e37553 2022-11-02)
+# rustc 1.66.1 (90743e729 2023-01-10)
 # binary: rustc
-# commit-hash: 897e37553bba8b42751c67658967889d11ecd120
-# commit-date: 2022-11-02
+# commit-hash: 90743e7298aca107ddaa0c202a4d3604e29bfeb6
+# commit-date: 2023-01-10
 # host: x86_64-unknown-linux-gnu
-# release: 1.65.0
-# LLVM version: 15.0.0
+# release: 1.66.1
+# LLVM version: 15.0.2
 
 # 2. Compiling application (linux-musl x86_64)...
 #     Finished release [optimized] target(s) in 0.01s
