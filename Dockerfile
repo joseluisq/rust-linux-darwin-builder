@@ -75,8 +75,8 @@ RUN set -eux \
 # Build a static library version of OpenSSL using musl-libc. This is needed by
 # the popular Rust `hyper` crate.
 
-# OpenSSL 1.1.1 - https://www.openssl.org/source/old/1.1.1/
-ARG OPENSSL_VERSION=1.1.1q
+# OpenSSL 1.1.1 - https://github.com/openssl/openssl/releases
+ARG OPENSSL_VERSION=1.1.1t
 
 # We point /usr/local/musl/include/linux at some Linux kernel headers (not
 # necessarily the right ones) in an effort to compile OpenSSL 1.1's "engine"
@@ -96,7 +96,8 @@ RUN set -eux \
     && ln -s "/usr/include/$(uname -m)-linux-gnu/asm" /usr/local/musl/include/asm \
     && ln -s /usr/include/asm-generic /usr/local/musl/include/asm-generic \
     && cd /tmp \
-    && curl -LO "https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz" \
+    && ver=$(echo $OPENSSL_VERSION | sed -e 's:\.:_:g') \
+    && curl -LO "https://github.com/openssl/openssl/releases/download/OpenSSL_${ver}/openssl-${OPENSSL_VERSION}.tar.gz" \
     && tar xvzf "openssl-${OPENSSL_VERSION}.tar.gz" \
     && cd "openssl-${OPENSSL_VERSION}" \
     && env CC=musl-gcc ./Configure no-shared no-zlib -fPIC --prefix=/usr/local/musl -DOPENSSL_NO_SECURE_MEMORY ${config} "linux-$(uname -m)" \
@@ -127,7 +128,7 @@ RUN set -eux \
 
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=15.1
+ARG POSTGRESQL_VERSION=15.2
 
 RUN set -eux \
     && echo "Building libpq ${POSTGRESQL_VERSION}..." \
