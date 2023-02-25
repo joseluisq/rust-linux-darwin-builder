@@ -48,6 +48,7 @@ RUN set -eux \
         python3 \
         xutils-dev \
         yasm \
+        xz-utils \
         zlib1g-dev \
     # Clean up local repository of retrieved packages and remove the package lists
     && apt-get clean \
@@ -200,6 +201,8 @@ RUN set -eux \
     && true
 
 ENV PATH $PATH:/usr/local/osxcross/target/bin
+ENV MACOSX_DEPLOYMENT_TARGET=${OSX_VERSION_MIN}
+ENV OSXCROSS_MACPORTS_MIRROR=https://packages.macports.org
 
 RUN set -eux \
     && echo "Testing osxcross with compiler-rt..." \
@@ -207,6 +210,13 @@ RUN set -eux \
     && echo "compiler-rt installed and working successfully!" \
     && true
 
+RUN set -eux \
+    && echo "Install dependencies via osxcross tools..." \
+    && apt-get update \
+    && /usr/local/osxcross/tools/get_dependencies.sh \
+    && osxcross-macports install cctools zlib openssl libarchive \
+    && osxcross-macports upgrade \
+    && true
 
 # Rust stable toolchain
 ARG TOOLCHAIN=stable
