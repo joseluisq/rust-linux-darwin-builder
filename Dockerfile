@@ -77,7 +77,7 @@ RUN set -eux \
 # the popular Rust `hyper` crate.
 
 # OpenSSL 1.1.1 - https://github.com/openssl/openssl/releases
-ARG OPENSSL_VERSION=1.1.1t
+ARG OPENSSL_VERSION=1.1.1u
 
 # We point /usr/local/musl/include/linux at some Linux kernel headers (not
 # necessarily the right ones) in an effort to compile OpenSSL 1.1's "engine"
@@ -129,7 +129,7 @@ RUN set -eux \
 
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=15.2
+ARG POSTGRESQL_VERSION=15.3
 
 RUN set -eux \
     && echo "Building libpq ${POSTGRESQL_VERSION}..." \
@@ -166,12 +166,12 @@ ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/musl/ \
 
 
 # Mac OS X SDK version - https://github.com/joseluisq/macosx-sdks
-ARG OSX_SDK_VERSION=12.3
-ARG OSX_SDK_SUM=3abd261ceb483c44295a6623fdffe5d44fc4ac2c872526576ec5ab5ad0f6e26c
+ARG OSX_SDK_VERSION=13.1
+ARG OSX_SDK_SUM=efa167d0e463e40f9a3f3e95a2d4f265552834442872341d5669d3264ba9b702
 ARG OSX_VERSION_MIN=10.14
 
 # OS X Cross - https://github.com/tpoechtrager/osxcross
-ARG OSX_CROSS_COMMIT=50e86ebca7d14372febd0af8cd098705049161b9
+ARG OSX_CROSS_COMMIT=ed079949e7aee248ad7e7cb97726cd1c8556afd1
 
 # Install OS X Cross
 # A Mac OS X cross toolchain for Linux, FreeBSD, OpenBSD and Android

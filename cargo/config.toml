@@ -12,9 +12,9 @@ linker = "aarch64-linux-gnu-gcc"
 linker = "aarch64-linux-gnu-gcc"
 
 [target.x86_64-apple-darwin]
-linker = "x86_64-apple-darwin21.4-clang"
-ar = "x86_64-apple-darwin21.4-ar"
+linker = "x86_64-apple-darwin22.2-clang"
+ar = "x86_64-apple-darwin22.2-ar"
 
 [target.aarch64-apple-darwin]
-linker = "arm64e-apple-darwin21.4-clang"
-ar = "arm64e-apple-darwin21.4-ar"
+linker = "arm64e-apple-darwin22.2-clang"
+ar = "arm64e-apple-darwin22.2-ar"

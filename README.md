@@ -45,7 +45,7 @@ Below are the default toolchains included in the Docker image.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.69.0 \
+      joseluisq/rust-linux-darwin-builder:1.70.0 \
         sh -c "cargo build --release --target x86_64-unknown-linux-musl"
 ```
 
@@ -55,7 +55,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.69.0 \
+      joseluisq/rust-linux-darwin-builder:1.70.0 \
         sh -c "cargo build --release --target x86_64-unknown-linux-gnu"
 ```
 
@@ -65,7 +65,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.69.0 \
+      joseluisq/rust-linux-darwin-builder:1.70.0 \
         sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -77,7 +77,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.69.0 \
+      joseluisq/rust-linux-darwin-builder:1.70.0 \
         sh -c "cargo build --release --target aarch64-unknown-linux-gnu"
 ```
 
@@ -87,7 +87,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.69.0 \
+      joseluisq/rust-linux-darwin-builder:1.70.0 \
         sh -c "cargo build --release --target aarch64-unknown-linux-musl"
 ```
 
@@ -97,7 +97,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.69.0 \
+      joseluisq/rust-linux-darwin-builder:1.70.0 \
         sh -c "cargo build --release --target aarch64-apple-darwin"
 ```
 
@@ -110,7 +110,7 @@ It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-h
 You can also use the image as a base for your Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.69.0
+FROM joseluisq/rust-linux-darwin-builder:1.70.0
 ```
 
 ### OSXCross
@@ -127,14 +127,14 @@ Examples:
 ```sh
 Example usage:
 
-Example 1: CC=o32-clang ./configure --host=i386-apple-darwin21.4
-Example 2: CC=i386-apple-darwin21.4-clang ./configure --host=i386-apple-darwin21.4
+Example 1: CC=o32-clang ./configure --host=i386-apple-darwin22.2
+Example 2: CC=i386-apple-darwin22.2-clang ./configure --host=i386-apple-darwin22.2
 Example 3: o64-clang -Wall test.c -o test
-Example 4: x86_64-apple-darwin21.4-strip -x test
+Example 4: x86_64-apple-darwin22.2-strip -x test
 
-!!! Use aarch64-apple-darwin21.4-* instead of arm64-* when dealing with Automake !!!
-!!! CC=aarch64-apple-darwin21.4-clang ./configure --host=aarch64-apple-darwin21.4 !!!
-!!! CC="aarch64-apple-darwin21.4-clang -arch arm64e" ./configure --host=aarch64-apple-darwin21.4 !!!
+!!! Use aarch64-apple-darwin22.2-* instead of arm64-* when dealing with Automake !!!
+!!! CC=aarch64-apple-darwin22.2-clang ./configure --host=aarch64-apple-darwin22.2 !!!
+!!! CC="aarch64-apple-darwin22.2-clang -arch arm64e" ./configure --host=aarch64-apple-darwin22.2 !!!
 ```
 
 ### Cross-compilation example
@@ -153,7 +153,7 @@ compile:
 	@docker run --rm -it \
 		-v $(PWD):/drone/src \
 		-w /drone/src \
-			joseluisq/rust-linux-darwin-builder:1.69.0 \
+			joseluisq/rust-linux-darwin-builder:1.70.0 \
 				make cross-compile
 .PHONY: compile
 
@@ -178,13 +178,13 @@ Just run the makefile `compile` target, then you will see two release binaries `
 make compile
 # 1. Cross compiling example...
 
-# rustc 1.69.0 (84c898d65 2023-04-16)
+# rustc 1.70.0 (90c541806 2023-05-31)
 # binary: rustc
-# commit-hash: 84c898d65adf2f39a5a98507f1fe0ce10a2b8dbc
-# commit-date: 2023-04-16
+# commit-hash: 90c541806f23a127002de5b4038be731ba1458ca
+# commit-date: 2023-05-31
 # host: aarch64-apple-darwin
-# release: 1.69.0
-# LLVM version: 15.0.7
+# release: 1.70.0
+# LLVM version: 16.0.2
 
 # 2. Compiling application (linux-musl x86_64)...
 #     Finished release [optimized] target(s) in 0.01s
