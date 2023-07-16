@@ -28,7 +28,7 @@ task:
   timeout_in: 120m
   env:
     DOCKER_USERNAME: ENCRYPTED[db65fd6fc1af68040964a27c82f2cbd202c849199038cfddc961a573d803a4f2793ba30eede0b6bcdb6bbf29f5c4f012]
-    DOCKER_PASSWORD: ENCRYPTED[c201154ee561b3ca486047160db1c2ae77f766abf880feb5f57a10201374ba661ec7a796928ca8eb3a92aa007c684c37]
+    DOCKER_PASSWORD: ENCRYPTED[a1503baddfbe37c5a4474c46ec12b11beee3d16c054c1fa5bfcdde674be32524781f9d4e4d9444db6575fc5aa6270040]
   matrix:
     - name: linux-amd64
       env:
@@ -61,7 +61,7 @@ release_docker_builder:
     - build-linux-image
   env:
     DOCKER_USERNAME: ENCRYPTED[db65fd6fc1af68040964a27c82f2cbd202c849199038cfddc961a573d803a4f2793ba30eede0b6bcdb6bbf29f5c4f012]
-    DOCKER_PASSWORD: ENCRYPTED[c201154ee561b3ca486047160db1c2ae77f766abf880feb5f57a10201374ba661ec7a796928ca8eb3a92aa007c684c37]
+    DOCKER_PASSWORD: ENCRYPTED[a1503baddfbe37c5a4474c46ec12b11beee3d16c054c1fa5bfcdde674be32524781f9d4e4d9444db6575fc5aa6270040]
   login_script: |
     docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
   push_latest_script: |

@@ -22,7 +22,7 @@
 
 ## Overview
 
-This is a __Linux Docker image__ based on [ekidd/rust-musl-builder](https://hub.docker.com/r/ekidd/rust-musl-builder) but using latest __Debian [11-slim](https://hub.docker.com/_/debian?tab=tags&page=1&name=11-slim)__ ([Bullseye](https://www.debian.org/News/2021/20210814)).
+This is a __Linux Docker image__ based on [ekidd/rust-musl-builder](https://hub.docker.com/r/ekidd/rust-musl-builder) but using the latest __Debian [12-slim](https://hub.docker.com/_/debian/tags?page=1&name=12-slim)__ ([Bookworm](https://www.debian.org/News/2023/20230610)).
 
 It contains essential tools for cross-compile [Rust](https://www.rust-lang.org/) projects such as __Linux__ static binaries via [musl-libc / musl-gcc](https://doc.rust-lang.org/edition-guide/rust-2018/platform-and-target-support/musl-support-for-fully-static-binaries.html) (`x86_64-unknown-linux-musl`) and __macOS__ binaries (`x86_64-apple-darwin`) via [osxcross](https://github.com/tpoechtrager/osxcross) just using the same Linux image.
 
@@ -45,7 +45,7 @@ Below are the default toolchains included in the Docker image.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.70.0 \
+      joseluisq/rust-linux-darwin-builder:1.71.0 \
         sh -c "cargo build --release --target x86_64-unknown-linux-musl"
 ```
 
@@ -55,7 +55,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.70.0 \
+      joseluisq/rust-linux-darwin-builder:1.71.0 \
         sh -c "cargo build --release --target x86_64-unknown-linux-gnu"
 ```
 
@@ -65,7 +65,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.70.0 \
+      joseluisq/rust-linux-darwin-builder:1.71.0 \
         sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -77,7 +77,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.70.0 \
+      joseluisq/rust-linux-darwin-builder:1.71.0 \
         sh -c "cargo build --release --target aarch64-unknown-linux-gnu"
 ```
 
@@ -87,7 +87,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.70.0 \
+      joseluisq/rust-linux-darwin-builder:1.71.0 \
         sh -c "cargo build --release --target aarch64-unknown-linux-musl"
 ```
 
@@ -97,7 +97,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.70.0 \
+      joseluisq/rust-linux-darwin-builder:1.71.0 \
         sh -c "cargo build --release --target aarch64-apple-darwin"
 ```
 
@@ -110,7 +110,7 @@ It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-h
 You can also use the image as a base for your Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.70.0
+FROM joseluisq/rust-linux-darwin-builder:1.71.0
 ```
 
 ### OSXCross
@@ -153,7 +153,7 @@ compile:
 	@docker run --rm -it \
 		-v $(PWD):/drone/src \
 		-w /drone/src \
-			joseluisq/rust-linux-darwin-builder:1.70.0 \
+			joseluisq/rust-linux-darwin-builder:1.71.0 \
 				make cross-compile
 .PHONY: compile
 
@@ -178,13 +178,13 @@ Just run the makefile `compile` target, then you will see two release binaries `
 make compile
 # 1. Cross compiling example...
 
-# rustc 1.70.0 (90c541806 2023-05-31)
+# rustc 1.71.0 (8ede3aae2 2023-07-12)
 # binary: rustc
-# commit-hash: 90c541806f23a127002de5b4038be731ba1458ca
-# commit-date: 2023-05-31
-# host: aarch64-apple-darwin
-# release: 1.70.0
-# LLVM version: 16.0.2
+# commit-hash: 8ede3aae28fe6e4d52b38157d7bfe0d3bceef225
+# commit-date: 2023-07-12
+# host: aarch64-unknown-linux-gnu
+# release: 1.71.0
+# LLVM version: 16.0.5
 
 # 2. Compiling application (linux-musl x86_64)...
 #     Finished release [optimized] target(s) in 0.01s

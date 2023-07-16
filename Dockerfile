@@ -1,6 +1,6 @@
 # NOTE: Most of Dockerfile and related were borrowed from https://hub.docker.com/r/ekidd/rust-musl-builder
 
-FROM debian:11-slim
+FROM debian:12.0-slim
 
 ARG VERSION=0.0.0
 ENV VERSION=${VERSION}
@@ -44,7 +44,6 @@ RUN set -eux \
         musl-tools \
         patch \
         pkgconf \
-        python \
         python3 \
         xutils-dev \
         yasm \
@@ -171,7 +170,7 @@ ARG OSX_SDK_SUM=efa167d0e463e40f9a3f3e95a2d4f265552834442872341d5669d3264ba9b702
 ARG OSX_VERSION_MIN=10.14
 
 # OS X Cross - https://github.com/tpoechtrager/osxcross
-ARG OSX_CROSS_COMMIT=ed079949e7aee248ad7e7cb97726cd1c8556afd1
+ARG OSX_CROSS_COMMIT=564e2b9aa8e7a40da663d890c0e853a1259ff8b1
 
 # Install OS X Cross
 # A Mac OS X cross toolchain for Linux, FreeBSD, OpenBSD and Android
