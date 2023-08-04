@@ -45,7 +45,7 @@ Below are the default toolchains included in the Docker image.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.71.0 \
+      joseluisq/rust-linux-darwin-builder:1.71.1 \
         sh -c "cargo build --release --target x86_64-unknown-linux-musl"
 ```
 
@@ -55,7 +55,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.71.0 \
+      joseluisq/rust-linux-darwin-builder:1.71.1 \
         sh -c "cargo build --release --target x86_64-unknown-linux-gnu"
 ```
 
@@ -65,7 +65,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.71.0 \
+      joseluisq/rust-linux-darwin-builder:1.71.1 \
         sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -77,7 +77,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.71.0 \
+      joseluisq/rust-linux-darwin-builder:1.71.1 \
         sh -c "cargo build --release --target aarch64-unknown-linux-gnu"
 ```
 
@@ -87,7 +87,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.71.0 \
+      joseluisq/rust-linux-darwin-builder:1.71.1 \
         sh -c "cargo build --release --target aarch64-unknown-linux-musl"
 ```
 
@@ -97,7 +97,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.71.0 \
+      joseluisq/rust-linux-darwin-builder:1.71.1 \
         sh -c "cargo build --release --target aarch64-apple-darwin"
 ```
 
@@ -110,7 +110,7 @@ It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-h
 You can also use the image as a base for your Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.71.0
+FROM joseluisq/rust-linux-darwin-builder:1.71.1
 ```
 
 ### OSXCross
@@ -153,7 +153,7 @@ compile:
 	@docker run --rm -it \
 		-v $(PWD):/drone/src \
 		-w /drone/src \
-			joseluisq/rust-linux-darwin-builder:1.71.0 \
+			joseluisq/rust-linux-darwin-builder:1.71.1 \
 				make cross-compile
 .PHONY: compile
 
@@ -178,12 +178,12 @@ Just run the makefile `compile` target, then you will see two release binaries `
 make compile
 # 1. Cross compiling example...
 
-# rustc 1.71.0 (8ede3aae2 2023-07-12)
+# rustc 1.71.1 (eb26296b5 2023-08-03)
 # binary: rustc
-# commit-hash: 8ede3aae28fe6e4d52b38157d7bfe0d3bceef225
-# commit-date: 2023-07-12
+# commit-hash: eb26296b556cef10fb713a38f3d16b9886080f26
+# commit-date: 2023-08-03
 # host: aarch64-unknown-linux-gnu
-# release: 1.71.0
+# release: 1.71.1
 # LLVM version: 16.0.5
 
 # 2. Compiling application (linux-musl x86_64)...

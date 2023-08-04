@@ -1,6 +1,6 @@
 # NOTE: Most of Dockerfile and related were borrowed from https://hub.docker.com/r/ekidd/rust-musl-builder
 
-FROM debian:12.0-slim
+FROM debian:12.1-slim
 
 ARG VERSION=0.0.0
 ENV VERSION=${VERSION}
@@ -76,7 +76,7 @@ RUN set -eux \
 # the popular Rust `hyper` crate.
 
 # OpenSSL 1.1.1 - https://github.com/openssl/openssl/releases
-ARG OPENSSL_VERSION=1.1.1u
+ARG OPENSSL_VERSION=1.1.1v
 
 # We point /usr/local/musl/include/linux at some Linux kernel headers (not
 # necessarily the right ones) in an effort to compile OpenSSL 1.1's "engine"
