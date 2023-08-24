@@ -13,6 +13,8 @@ LABEL version="${VERSION}" \
 # here is to support the musl-libc builds and Cargo builds needed for a
 # large selection of the most popular crates.
 RUN set -eux \
+    && dpkg --add-architecture armhf \
+    && dpkg --add-architecture arm64 \
     && DEBIAN_FRONTEND=noninteractive apt-get update -qq \
     && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends --no-install-suggests \
         autoconf \
@@ -41,6 +43,8 @@ RUN set -eux \
         llvm-dev \
         lzma-dev \
         musl-dev \
+        musl-dev:armhf \
+        musl-dev:arm64 \
         musl-tools \
         patch \
         pkgconf \
