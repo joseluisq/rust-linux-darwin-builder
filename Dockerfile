@@ -112,12 +112,12 @@ RUN set -eux \
 
 
 # zlib - http://zlib.net/
-ARG ZLIB_VERSION=1.2.13
+ARG ZLIB_VERSION=1.3
 
 RUN set -eux \
     && echo "Building zlib ${ZLIB_VERSION}..." \
     && cd /tmp \
-    && curl -LO "http://zlib.net/zlib-${ZLIB_VERSION}.tar.gz" \
+    && curl -LO "https://www.zlib.net/fossils/zlib-${ZLIB_VERSION}.tar.gz" \
     && tar xzf "zlib-${ZLIB_VERSION}.tar.gz" \
     && cd "zlib-${ZLIB_VERSION}" \
     && env CC=musl-gcc ./configure --static --prefix=/usr/local/musl \
