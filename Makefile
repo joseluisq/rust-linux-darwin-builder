@@ -44,86 +44,86 @@ test-ci:
 		&& if [ "$$(uname -m)" = "x86_64" ]; then \
 			echo "Compiling application (linux-gnu x86_64)..."; \
 			cargo build --release --target x86_64-unknown-linux-gnu; \
-			du -sh target/x86_64-unknown-linux-gnu/release/helloworld; \
-			target/x86_64-unknown-linux-gnu/release/helloworld; \
+			du -sh target/x86_64-unknown-linux-gnu/release/hello-world-test; \
+			target/x86_64-unknown-linux-gnu/release/hello-world-test; \
 			echo; \
 \
 			echo "Compiling application (linux-musl x86_64)..."; \
 			cargo build --release --target x86_64-unknown-linux-musl; \
-			du -sh target/x86_64-unknown-linux-musl/release/helloworld; \
-			target/x86_64-unknown-linux-musl/release/helloworld; \
+			du -sh target/x86_64-unknown-linux-musl/release/hello-world-test; \
+			target/x86_64-unknown-linux-musl/release/hello-world-test; \
 			echo; \
 		fi \
 \
 		&& echo "Cross-compiling application (apple-darwin x86_64)..." \
 		&& cargo build --release --target x86_64-apple-darwin \
-		&& du -sh target/x86_64-apple-darwin/release/helloworld \
+		&& du -sh target/x86_64-apple-darwin/release/hello-world-test \
 		&& echo \
 \
 \
 		&& echo "Cross-compiling application (linux-gnu aarch64)..." \
 		&& cargo build --release --target aarch64-unknown-linux-gnu \
-		&& du -sh target/aarch64-unknown-linux-gnu/release/helloworld \
+		&& du -sh target/aarch64-unknown-linux-gnu/release/hello-world-test \
 		&& if [ "$$(uname -m)" = "aarch64" ]; then \
-			target/aarch64-unknown-linux-gnu/release/helloworld; \
+			target/aarch64-unknown-linux-gnu/release/hello-world-test; \
 		fi \
 		&& echo \
 \
 		&& echo "Cross-compiling application (linux-musl aarch64)..." \
 		&& cargo build --release --target aarch64-unknown-linux-musl \
-		&& du -sh target/aarch64-unknown-linux-musl/release/helloworld \
+		&& du -sh target/aarch64-unknown-linux-musl/release/hello-world-test \
 		&& if [ "$$(uname -m)" = "aarch64" ]; then \
-			target/aarch64-unknown-linux-musl/release/helloworld; \
+			target/aarch64-unknown-linux-musl/release/hello-world-test; \
 		fi \
 		&& echo \
 \
 		&& echo "Cross-compiling application (apple-darwin aarch64)..." \
 		&& cargo build --release --target aarch64-apple-darwin \
-		&& du -sh target/aarch64-apple-darwin/release/helloworld
+		&& du -sh target/aarch64-apple-darwin/release/hello-world-test
 	@echo
 	@cd ../..
-	@cd tests/flate2-test \
+	@cd tests/zlib \
 \
 		&& if [ "$$(uname -m)" = "x86_64" ]; then \
 			echo "Compiling application (linux-gnu x86_64)..."; \
 			cargo build --release --target x86_64-unknown-linux-gnu; \
-			du -sh target/x86_64-unknown-linux-gnu/release/flate2-test; \
-			target/x86_64-unknown-linux-gnu/release/flate2-test; \
+			du -sh target/x86_64-unknown-linux-gnu/release/zlib-test; \
+			target/x86_64-unknown-linux-gnu/release/zlib-test; \
 			echo; \
 \
 			echo "Compiling application (linux-musl x86_64)..."; \
 			cargo build --release --target x86_64-unknown-linux-musl; \
-			du -sh target/x86_64-unknown-linux-musl/release/flate2-test; \
-			target/x86_64-unknown-linux-musl/release/flate2-test; \
+			du -sh target/x86_64-unknown-linux-musl/release/zlib-test; \
+			target/x86_64-unknown-linux-musl/release/zlib-test; \
 			echo; \
 		fi \
 \
 		&& echo "Cross-compiling application (apple-darwin x86_64)..." \
-		&& LIBZ_SYS_STATIC=0 CC=arm64e-apple-darwin22.2-clang CXX=arm64e-apple-darwin22.2-clang++ \
+		&& LIBZ_SYS_STATIC=0 CC=o64-clang CXX=o64-clang++ \
 			cargo build --release --target x86_64-apple-darwin \
-		&& du -sh target/x86_64-apple-darwin/release/flate2-test \
+		&& du -sh target/x86_64-apple-darwin/release/zlib-test \
 		&& echo \
 \
 \
 		&& echo "Cross-compiling application (linux-gnu aarch64)..." \
 		&& cargo build --release --target aarch64-unknown-linux-gnu \
-		&& du -sh target/aarch64-unknown-linux-gnu/release/flate2-test \
+		&& du -sh target/aarch64-unknown-linux-gnu/release/zlib-test \
 		&& if [ "$$(uname -m)" = "aarch64" ]; then \
-			target/aarch64-unknown-linux-gnu/release/flate2-test; \
+			target/aarch64-unknown-linux-gnu/release/zlib-test; \
 		fi \
 		&& echo \
 \
 		&& echo "Cross-compiling application (linux-musl aarch64)..." \
 		&& cargo build --release --target aarch64-unknown-linux-musl \
-		&& du -sh target/aarch64-unknown-linux-musl/release/flate2-test \
+		&& du -sh target/aarch64-unknown-linux-musl/release/zlib-test \
 		&& if [ "$$(uname -m)" = "aarch64" ]; then \
-			target/aarch64-unknown-linux-musl/release/flate2-test; \
+			target/aarch64-unknown-linux-musl/release/zlib-test; \
 		fi \
 		&& echo \
 \
 		&& echo "Cross-compiling application (apple-darwin aarch64)..." \
-		&& LIBZ_SYS_STATIC=0 CC=arm64e-apple-darwin22.2-clang CXX=arm64e-apple-darwin22.2-clang++ \
+		&& LIBZ_SYS_STATIC=0 CC=o64-clang CXX=o64-clang++ \
 			cargo build --release --target aarch64-apple-darwin \
-		&& du -sh target/aarch64-apple-darwin/release/flate2-test
+		&& du -sh target/aarch64-apple-darwin/release/zlib-test
 
 .ONESHELL: test-ci

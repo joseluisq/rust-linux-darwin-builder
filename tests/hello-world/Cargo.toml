@@ -1,8 +1,8 @@
 [package]
-name = "helloworld"
+name = "hello-world-test"
 version = "0.0.0"
 authors = ["Jose Quintana <https://github.com/joseluisq>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 
