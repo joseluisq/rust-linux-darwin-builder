@@ -1,0 +1,11 @@
+[package]
+name = "flate2-test"
+version = "0.0.0"
+authors = ["Jose Quintana <https://github.com/joseluisq>"]
+edition = "2021"
+
+[dependencies]
+flate2 = { version = "1.0", features = [ "zlib-default" ]}
+
+[profile.release]
+lto = true

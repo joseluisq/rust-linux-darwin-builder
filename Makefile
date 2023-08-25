@@ -80,5 +80,50 @@ test-ci:
 		&& echo "Cross-compiling application (apple-darwin aarch64)..." \
 		&& cargo build --release --target aarch64-apple-darwin \
 		&& du -sh target/aarch64-apple-darwin/release/helloworld
+	@echo
+	@cd ../..
+	@cd tests/flate2-test \
+\
+		&& if [ "$$(uname -m)" = "x86_64" ]; then \
+			echo "Compiling application (linux-gnu x86_64)..."; \
+			cargo build --release --target x86_64-unknown-linux-gnu; \
+			du -sh target/x86_64-unknown-linux-gnu/release/flate2-test; \
+			target/x86_64-unknown-linux-gnu/release/flate2-test; \
+			echo; \
+\
+			echo "Compiling application (linux-musl x86_64)..."; \
+			cargo build --release --target x86_64-unknown-linux-musl; \
+			du -sh target/x86_64-unknown-linux-musl/release/flate2-test; \
+			target/x86_64-unknown-linux-musl/release/flate2-test; \
+			echo; \
+		fi \
+\
+		&& echo "Cross-compiling application (apple-darwin x86_64)..." \
+		&& LIBZ_SYS_STATIC=0 CC=arm64e-apple-darwin22.2-clang CXX=arm64e-apple-darwin22.2-clang++ \
+			cargo build --release --target x86_64-apple-darwin \
+		&& du -sh target/x86_64-apple-darwin/release/flate2-test \
+		&& echo \
+\
+\
+		&& echo "Cross-compiling application (linux-gnu aarch64)..." \
+		&& cargo build --release --target aarch64-unknown-linux-gnu \
+		&& du -sh target/aarch64-unknown-linux-gnu/release/flate2-test \
+		&& if [ "$$(uname -m)" = "aarch64" ]; then \
+			target/aarch64-unknown-linux-gnu/release/flate2-test; \
+		fi \
+		&& echo \
+\
+		&& echo "Cross-compiling application (linux-musl aarch64)..." \
+		&& cargo build --release --target aarch64-unknown-linux-musl \
+		&& du -sh target/aarch64-unknown-linux-musl/release/flate2-test \
+		&& if [ "$$(uname -m)" = "aarch64" ]; then \
+			target/aarch64-unknown-linux-musl/release/flate2-test; \
+		fi \
+		&& echo \
+\
+		&& echo "Cross-compiling application (apple-darwin aarch64)..." \
+		&& LIBZ_SYS_STATIC=0 CC=arm64e-apple-darwin22.2-clang CXX=arm64e-apple-darwin22.2-clang++ \
+			cargo build --release --target aarch64-apple-darwin \
+		&& du -sh target/aarch64-apple-darwin/release/flate2-test
 
 .ONESHELL: test-ci
