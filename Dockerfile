@@ -132,7 +132,7 @@ RUN set -eux \
 
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=15.3
+ARG POSTGRESQL_VERSION=15.4
 
 RUN set -eux \
     && echo "Building libpq ${POSTGRESQL_VERSION}..." \
@@ -169,12 +169,12 @@ ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/musl/ \
 
 
 # Mac OS X SDK version - https://github.com/joseluisq/macosx-sdks
-ARG OSX_SDK_VERSION=13.1
-ARG OSX_SDK_SUM=efa167d0e463e40f9a3f3e95a2d4f265552834442872341d5669d3264ba9b702
+ARG OSX_SDK_VERSION=13.3
+ARG OSX_SDK_SUM=518e35eae6039b3f64e8025f4525c1c43786cc5cf39459d609852faf091e34be
 ARG OSX_VERSION_MIN=10.14
 
 # OS X Cross - https://github.com/tpoechtrager/osxcross
-ARG OSX_CROSS_COMMIT=564e2b9aa8e7a40da663d890c0e853a1259ff8b1
+ARG OSX_CROSS_COMMIT=a78f48ae2ae5c1b2d968d386e59f691d7a331b11
 
 # Install OS X Cross
 # A Mac OS X cross toolchain for Linux, FreeBSD, OpenBSD and Android
