@@ -80,7 +80,7 @@ RUN set -eux \
 # the popular Rust `hyper` crate.
 
 # OpenSSL 1.1.1 - https://github.com/openssl/openssl/releases
-ARG OPENSSL_VERSION=1.1.1v
+ARG OPENSSL_VERSION=1.1.1w
 
 # We point /usr/local/musl/include/linux at some Linux kernel headers (not
 # necessarily the right ones) in an effort to compile OpenSSL 1.1's "engine"
@@ -174,7 +174,7 @@ ARG OSX_SDK_SUM=518e35eae6039b3f64e8025f4525c1c43786cc5cf39459d609852faf091e34be
 ARG OSX_VERSION_MIN=10.14
 
 # OS X Cross - https://github.com/tpoechtrager/osxcross
-ARG OSX_CROSS_COMMIT=a78f48ae2ae5c1b2d968d386e59f691d7a331b11
+ARG OSX_CROSS_COMMIT=c0cb74c8c01a66be0b6d05788f05201d87d9df9f
 
 # Install OS X Cross
 # A Mac OS X cross toolchain for Linux, FreeBSD, OpenBSD and Android

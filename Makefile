@@ -5,6 +5,7 @@ TAG ?= latest
 build:
 	docker build \
 		-t $(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
+		--network=host \
 		-f Dockerfile .
 .PHONY: build
 
