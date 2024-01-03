@@ -1,6 +1,6 @@
 # NOTE: Most of Dockerfile and related were borrowed from https://hub.docker.com/r/ekidd/rust-musl-builder
 
-FROM debian:12.2-slim
+FROM debian:12.4-slim
 
 ARG VERSION=0.0.0
 ENV VERSION=${VERSION}
