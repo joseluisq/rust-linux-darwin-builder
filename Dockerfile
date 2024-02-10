@@ -116,7 +116,7 @@ RUN set -eux \
 
 
 # zlib - http://zlib.net/
-ARG ZLIB_VERSION=1.3
+ARG ZLIB_VERSION=1.3.1
 
 RUN set -eux \
     && echo "Building zlib ${ZLIB_VERSION}..." \
@@ -132,7 +132,7 @@ RUN set -eux \
 
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=15.5
+ARG POSTGRESQL_VERSION=15.6
 
 RUN set -eux \
     && echo "Building libpq ${POSTGRESQL_VERSION}..." \

@@ -1,6 +1,6 @@
 <div>
   <div align="center">
-    <img src="https://www.rust-lang.org/logos/rust-logo-blk.svg" height="100" width="100" />
+    <img src="https://www.rust-lang.org/logos/rust-logo-blk.svg" height="130" width="130" />
   </div>
 
   <h1 align="center">Rust Linux / Darwin Builder</h1>
@@ -42,7 +42,7 @@ Below are the default toolchains included in the Docker image.
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.75.0 \
+      joseluisq/rust-linux-darwin-builder:1.76.0 \
         sh -c "cargo build --release --target x86_64-unknown-linux-musl"
 ```
 
@@ -52,7 +52,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.75.0 \
+      joseluisq/rust-linux-darwin-builder:1.76.0 \
         sh -c "cargo build --release --target x86_64-unknown-linux-gnu"
 ```
 
@@ -62,7 +62,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.75.0 \
+      joseluisq/rust-linux-darwin-builder:1.76.0 \
         sh -c "cargo build --release --target x86_64-apple-darwin"
 ```
 
@@ -74,7 +74,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.75.0 \
+      joseluisq/rust-linux-darwin-builder:1.76.0 \
         sh -c "cargo build --release --target aarch64-unknown-linux-gnu"
 ```
 
@@ -84,7 +84,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.75.0 \
+      joseluisq/rust-linux-darwin-builder:1.76.0 \
         sh -c "cargo build --release --target aarch64-unknown-linux-musl"
 ```
 
@@ -94,7 +94,7 @@ docker run --rm \
 docker run --rm \
     --volume "${PWD}/sample":/root/src \
     --workdir /root/src \
-      joseluisq/rust-linux-darwin-builder:1.75.0 \
+      joseluisq/rust-linux-darwin-builder:1.76.0 \
         sh -c "cargo build --release --target aarch64-apple-darwin"
 ```
 
@@ -107,7 +107,7 @@ It's known that the [`CARGO_HOME`](https://doc.rust-lang.org/cargo/guide/cargo-h
 You can also use the image as a base for your Dockerfile:
 
 ```Dockerfile
-FROM joseluisq/rust-linux-darwin-builder:1.75.0
+FROM joseluisq/rust-linux-darwin-builder:1.76.0
 ```
 
 ### OSXCross
@@ -150,7 +150,7 @@ compile:
 	@docker run --rm -it \
 		-v $(PWD):/drone/src \
 		-w /drone/src \
-			joseluisq/rust-linux-darwin-builder:1.75.0 \
+			joseluisq/rust-linux-darwin-builder:1.76.0 \
 				make cross-compile
 .PHONY: compile
 
@@ -175,12 +175,12 @@ Just run the makefile `compile` target, then you will see two release binaries `
 make compile
 # 1. Cross compiling example...
 
-# rustc 1.75.0 (82e1608df 2023-12-21)
+# rustc 1.76.0 (07dca489a 2024-02-04)
 # binary: rustc
-# commit-hash: 82e1608dfa6e0b5569232559e3d385fea5a93112
-# commit-date: 2023-12-21
+# commit-hash: 07dca489ac2d933c78d3c5158e3f43beefeb02ce
+# commit-date: 2024-02-04
 # host: aarch64-unknown-linux-gnu
-# release: 1.75.0
+# release: 1.76.0
 # LLVM version: 17.0.6
 
 # 2. Compiling application (linux-musl x86_64)...
