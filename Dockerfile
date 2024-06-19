@@ -132,7 +132,7 @@ RUN set -eux \
 
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=15.6
+ARG POSTGRESQL_VERSION=15.7
 
 RUN set -eux \
     && echo "Building libpq ${POSTGRESQL_VERSION}..." \
@@ -217,8 +217,6 @@ RUN set -eux \
     && echo "Install dependencies via osxcross tools..." \
     && apt-get update \
     && /usr/local/osxcross/tools/get_dependencies.sh \
-    && osxcross-macports install cctools zlib openssl libarchive \
-    && osxcross-macports upgrade \
     && true
 
 # Rust stable toolchain
