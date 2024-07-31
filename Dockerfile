@@ -1,6 +1,6 @@
 # NOTE: Most of Dockerfile and related were borrowed from https://hub.docker.com/r/ekidd/rust-musl-builder
 
-FROM debian:12.5-slim
+FROM debian:12.6-slim
 
 ARG VERSION=0.0.0
 ENV VERSION=${VERSION}
@@ -220,14 +220,14 @@ RUN set -eux \
     && true
 
 # Rust stable toolchain
-ARG TOOLCHAIN=stable
+ARG TOOLCHAIN=1.80.0
 
 # Install our Rust toolchain and the `musl` target. We patch the
 # command-line we pass to the installer so that it won't attempt to
 # interact with the user or fool around with TTYs. We also set the default
 # `--target` to musl so that our users don't need to keep overriding it manually.
 RUN set -eux \
-    && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain $TOOLCHAIN \
+    && curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=$TOOLCHAIN \
     && rustup target add \
         aarch64-apple-darwin \
         aarch64-unknown-linux-gnu \
