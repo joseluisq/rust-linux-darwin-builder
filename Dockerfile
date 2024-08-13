@@ -132,7 +132,7 @@ RUN set -eux \
 
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=15.7
+ARG POSTGRESQL_VERSION=15.8
 
 RUN set -eux \
     && echo "Building libpq ${POSTGRESQL_VERSION}..." \
@@ -220,7 +220,7 @@ RUN set -eux \
     && true
 
 # Rust stable toolchain
-ARG TOOLCHAIN=1.80.0
+ARG TOOLCHAIN=1.80.1
 
 # Install our Rust toolchain and the `musl` target. We patch the
 # command-line we pass to the installer so that it won't attempt to
