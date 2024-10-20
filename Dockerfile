@@ -174,7 +174,7 @@ ARG OSX_SDK_SUM=518e35eae6039b3f64e8025f4525c1c43786cc5cf39459d609852faf091e34be
 ARG OSX_VERSION_MIN=10.14
 
 # OS X Cross - https://github.com/tpoechtrager/osxcross
-ARG OSX_CROSS_COMMIT=ff8d100f3f026b4ffbe4ce96d8aac4ce06f1278b
+ARG OSX_CROSS_COMMIT=29fe6dd35522073c9df5800f8cd1feb4b9a993a8
 
 # Install OS X Cross
 # A Mac OS X cross toolchain for Linux, FreeBSD, OpenBSD and Android
@@ -220,7 +220,7 @@ RUN set -eux \
     && true
 
 # Rust stable toolchain
-ARG TOOLCHAIN=1.81.0
+ARG TOOLCHAIN=1.82.0
 
 # Install our Rust toolchain and the `musl` target. We patch the
 # command-line we pass to the installer so that it won't attempt to
