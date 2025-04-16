@@ -1,6 +1,6 @@
 # NOTE: Most of Dockerfile and related were borrowed from https://hub.docker.com/r/ekidd/rust-musl-builder
 
-FROM debian:12.9-slim
+FROM debian:12.10-slim
 
 ARG VERSION=0.0.0
 ENV VERSION=${VERSION}
@@ -174,7 +174,7 @@ ARG OSX_SDK_SUM=518e35eae6039b3f64e8025f4525c1c43786cc5cf39459d609852faf091e34be
 ARG OSX_VERSION_MIN=10.14
 
 # OS X Cross - https://github.com/tpoechtrager/osxcross
-ARG OSX_CROSS_COMMIT=29fe6dd35522073c9df5800f8cd1feb4b9a993a8
+ARG OSX_CROSS_COMMIT=d0376b1c368055bd7ce26da97b86b7fbff2814f1
 
 # Install OS X Cross
 # A Mac OS X cross toolchain for Linux, FreeBSD, OpenBSD and Android
@@ -203,7 +203,7 @@ RUN set -eux \
     && env DISABLE_PARALLEL_ARCH_BUILD=1 ./build_compiler_rt.sh \
     && true
 
-ENV PATH $PATH:/usr/local/osxcross/target/bin
+ENV PATH=$PATH:/usr/local/osxcross/target/bin
 ENV MACOSX_DEPLOYMENT_TARGET=${OSX_VERSION_MIN}
 ENV OSXCROSS_MACPORTS_MIRROR=https://packages.macports.org
 
@@ -220,7 +220,7 @@ RUN set -eux \
     && true
 
 # Rust stable toolchain
-ARG TOOLCHAIN=1.84.1
+ARG TOOLCHAIN=1.85.1
 
 # Install our Rust toolchain and the `musl` target. We patch the
 # command-line we pass to the installer so that it won't attempt to
