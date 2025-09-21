@@ -25,12 +25,20 @@ buildx:
 
 .PHONY: buildx
 
+run:
+	@docker run --rm -it \
+		-v $(PWD):/root/src \
+		-w /root/src \
+			$(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
+				bash
+.PHONY: run
+
 test:
 	@docker run --rm \
 		-v $(PWD):/root/src \
 		-w /root/src \
 			$(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
-				bash -c 'set -eu; make test-ci'
+				bash -c 'set -eu; make test-ci; make test-openssl'
 .PHONY: test
 
 test-ci:
@@ -83,6 +91,7 @@ test-ci:
 		&& du -sh target/aarch64-apple-darwin/release/hello-world-test
 	@echo
 	@cd ../..
+	@echo "Compiling zlib app..."
 	@cd tests/zlib \
 \
 		&& if [ "$$(uname -m)" = "x86_64" ]; then \
@@ -104,7 +113,6 @@ test-ci:
 			cargo build --release --target x86_64-apple-darwin \
 		&& du -sh target/x86_64-apple-darwin/release/zlib-test \
 		&& echo \
-\
 \
 		&& echo "Cross-compiling application (linux-gnu aarch64)..." \
 		&& cargo build --release --target aarch64-unknown-linux-gnu \
@@ -128,3 +136,58 @@ test-ci:
 		&& du -sh target/aarch64-apple-darwin/release/zlib-test
 
 .ONESHELL: test-ci
+
+test-openssl:
+	@echo "Checking Debian version..."
+	@cat /etc/debian_version
+	@echo
+	@echo "Testing cross-compiling openssl application..."
+	@rustc -vV
+	@echo
+	@cd tests/openssl \
+\
+		&& if [ "$$(uname -m)" = "x86_64" ]; then \
+			echo "Compiling application (linux-gnu x86_64)..."; \
+			cargo build --release --target x86_64-unknown-linux-gnu; \
+			du -sh target/x86_64-unknown-linux-gnu/release/openssl; \
+			target/x86_64-unknown-linux-gnu/release/openssl; \
+			echo; \
+\
+			echo "Compiling application (linux-musl x86_64)..."; \
+			cargo build --release --target x86_64-unknown-linux-musl; \
+			du -sh target/x86_64-unknown-linux-musl/release/openssl; \
+			target/x86_64-unknown-linux-musl/release/openssl; \
+			echo; \
+		fi \
+\
+		&& echo "Cross-compiling application (apple-darwin x86_64)..." \
+		&& export OSXCROSS_MACPORTS_LIBEXEC=/usr/local/osxcross/target/macports/pkgs/opt/local/libexec \
+		&& OPENSSL_STATIC=1 \
+			OPENSSL_DIR=$$(echo $$OSXCROSS_MACPORTS_LIBEXEC)/openssl3/include/openssl \
+			OPENSSL_LIB_DIR=$$(echo $$OSXCROSS_MACPORTS_LIBEXEC)/openssl3/lib \
+			OPENSSL_INCLUDE_DIR=$$(echo $$OSXCROSS_MACPORTS_LIBEXEC)/openssl3/include \
+			CC=o64-clang CXX=o64-clang++ \
+				cargo build --release --target x86_64-apple-darwin \
+		&& du -sh target/x86_64-apple-darwin/release/openssl \
+		&& echo \
+\
+		&& if [ "$$(uname -m)" = "aarch64" ]; then \
+			echo "Cross-compiling application (linux-musl aarch64)..."; \
+			cargo build --release --target aarch64-unknown-linux-musl; \
+			du -sh target/aarch64-unknown-linux-musl/release/openssl; \
+			target/aarch64-unknown-linux-musl/release/openssl; \
+		fi \
+		&& echo \
+\
+		&& if [ "$$(uname -m)" = "aarch64" ]; then \
+			echo "Cross-compiling application (apple-darwin aarch64)..."; \
+			OPENSSL_STATIC=1 \
+				OPENSSL_DIR=$$(echo $$OSXCROSS_MACPORTS_LIBEXEC)/openssl3/include/openssl \
+				OPENSSL_LIB_DIR=$$(echo $$OSXCROSS_MACPORTS_LIBEXEC)/openssl3/lib \
+				OPENSSL_INCLUDE_DIR=$$(echo $$OSXCROSS_MACPORTS_LIBEXEC)/openssl3/include \
+				CC=o64-clang CXX=o64-clang++ \
+					cargo build --release --target aarch64-apple-darwin; \
+				du -sh target/aarch64-apple-darwin/release/openssl; \
+		fi \
+
+.ONESHELL: test-openssl

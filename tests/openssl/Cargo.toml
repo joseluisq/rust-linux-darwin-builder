@@ -1,11 +1,12 @@
 [package]
-name = "zlib-test"
+name = "openssl"
 version = "0.0.0"
 authors = ["Jose Quintana <https://github.com/joseluisq>"]
-edition = "2021"
+edition = "2018"
 
 [dependencies]
-flate2 = { version = "1.1.2", features = [ "zlib-default" ] }
+openssl-sys = "0.9.109"
+openssl = { version = "0.10.73" }
 
 [profile.release]
 lto = true
