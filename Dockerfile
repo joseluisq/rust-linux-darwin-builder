@@ -1,6 +1,6 @@
 # NOTE: Most of Dockerfile and related were borrowed from https://hub.docker.com/r/ekidd/rust-musl-builder
 
-FROM debian:12.11-slim
+FROM debian:12.12-slim
 
 ARG VERSION=0.0.0
 ENV VERSION=${VERSION}
@@ -19,15 +19,17 @@ RUN set -eux \
     && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends --no-install-suggests \
         autoconf \
         automake \
+        bison \
         build-essential \
         ca-certificates \
         clang \
         cmake \
         curl \
         file \
+        flex \
+        g++-aarch64-linux-gnu \
         gcc-aarch64-linux-gnu \
         gcc-arm-linux-gnueabihf \
-        g++-aarch64-linux-gnu \
         git \
         libbz2-dev \
         libgmp-dev \
@@ -43,15 +45,15 @@ RUN set -eux \
         llvm-dev \
         lzma-dev \
         musl-dev \
-        musl-dev:armhf \
         musl-dev:arm64 \
+        musl-dev:armhf \
         musl-tools \
         patch \
         pkgconf \
         python3 \
         xutils-dev \
-        yasm \
         xz-utils \
+        yasm \
         zlib1g-dev \
     # Clean up local repository of retrieved packages and remove the package lists
     && apt-get clean \
@@ -80,7 +82,7 @@ RUN set -eux \
 # the popular Rust `hyper` crate.
 
 # OpenSSL 1.1.1 - https://github.com/openssl/openssl/releases
-ARG OPENSSL_VERSION=1.1.1w
+ARG OPENSSL_VERSION=3.5.3
 
 # We point /usr/local/musl/include/linux at some Linux kernel headers (not
 # necessarily the right ones) in an effort to compile OpenSSL 1.1's "engine"
@@ -100,8 +102,7 @@ RUN set -eux \
     && ln -s "/usr/include/$(uname -m)-linux-gnu/asm" /usr/local/musl/include/asm \
     && ln -s /usr/include/asm-generic /usr/local/musl/include/asm-generic \
     && cd /tmp \
-    && ver=$(echo $OPENSSL_VERSION | sed -e 's:\.:_:g') \
-    && curl -LO "https://github.com/openssl/openssl/releases/download/OpenSSL_${ver}/openssl-${OPENSSL_VERSION}.tar.gz" \
+    && curl -LO "https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz" \
     && tar xvzf "openssl-${OPENSSL_VERSION}.tar.gz" \
     && cd "openssl-${OPENSSL_VERSION}" \
     && env CC=musl-gcc ./Configure no-shared no-zlib -fPIC --prefix=/usr/local/musl -DOPENSSL_NO_SECURE_MEMORY ${config} "linux-$(uname -m)" \
@@ -109,11 +110,27 @@ RUN set -eux \
     && env C_INCLUDE_PATH=/usr/local/musl/include/ make -j$(nproc) \
     && make -j$(nproc) install_sw \
     && make -j$(nproc) install_ssldirs \
-    && rm /usr/local/musl/include/linux /usr/local/musl/include/asm /usr/local/musl/include/asm-generic \
     && openssl version \
+    && rm -rf \
+        /usr/local/musl/include/linux \
+        /usr/local/musl/include/asm \
+        /usr/local/musl/include/asm-generic \
+    && ls -l /usr/local/musl \
+    && if [ "$(uname -m)" = "x86_64" ]; then \
+        ln -s /usr/local/musl/lib64 /usr/local/musl/lib; \
+    fi \
     && rm -r /tmp/* \
     && true
 
+RUN set -eux \
+    && echo "Testing musl-gcc with OpenSSL..." \
+    && openssl version \
+    && echo "int main(){return 0;}" | \
+        musl-gcc -o test -x c - \
+            -I/usr/local/musl/include \
+            -L/usr/local/musl/lib \
+            -lssl -lcrypto \
+    && true
 
 # zlib - http://zlib.net/
 ARG ZLIB_VERSION=1.3.1
@@ -132,7 +149,22 @@ RUN set -eux \
 
 
 # libpq - https://ftp.postgresql.org/pub/source/
-ARG POSTGRESQL_VERSION=15.9
+ARG POSTGRESQL_VERSION=17.6
+ARG ICU4C_VERSION=77.1
+
+RUN set -eux \
+    && echo "Building icu4c..." \
+    && cd /tmp \
+    && ver1=$(echo $ICU4C_VERSION | sed -e 's:\.:-:g') \
+    && ver2=$(echo $ICU4C_VERSION | sed -e 's:\.:_:g') \
+    && curl -LO https://github.com/unicode-org/icu/releases/download/release-${ver1}/icu4c-${ver2}-src.tgz \
+    && tar xf icu4c-${ver2}-src.tgz \
+    && cd icu/source \
+    && env CC=musl-gcc CXX=musl-g++ ./configure --prefix=/usr/local/musl \
+    && make -j$(nproc) \
+    && make -j$(nproc) install \
+    && rm -r /tmp/* \
+    && true
 
 RUN set -eux \
     && echo "Building libpq ${POSTGRESQL_VERSION}..." \
@@ -206,6 +238,8 @@ RUN set -eux \
 ENV PATH=$PATH:/usr/local/osxcross/target/bin
 ENV MACOSX_DEPLOYMENT_TARGET=${OSX_VERSION_MIN}
 ENV OSXCROSS_MACPORTS_MIRROR=https://packages.macports.org
+ENV OSXCROSS_MACPORTS_LOCAL=/usr/local/osxcross/target/macports/pkgs/opt/local
+ENV OSXCROSS_MACPORTS_LIBEXEC=${OSXCROSS_MACPORTS_LOCAL}/libexec
 
 RUN set -eux \
     && echo "Testing osxcross with compiler-rt..." \
@@ -217,10 +251,11 @@ RUN set -eux \
     && echo "Install dependencies via osxcross tools..." \
     && apt-get update \
     && /usr/local/osxcross/tools/get_dependencies.sh \
+    && osxcross-macports install zlib openssl3 \
     && true
 
 # Rust stable toolchain
-ARG TOOLCHAIN=1.86.0
+ARG TOOLCHAIN=1.87.0
 
 # Install our Rust toolchain and the `musl` target. We patch the
 # command-line we pass to the installer so that it won't attempt to
@@ -236,7 +271,7 @@ RUN set -eux \
         x86_64-apple-darwin \
         x86_64-unknown-linux-musl \
     && true
-COPY cargo/config.toml /root/.cargo/config
+COPY cargo/config.toml /root/.cargo/config.toml
 
 RUN set -eux \
     && echo "Removing temp files..." \
