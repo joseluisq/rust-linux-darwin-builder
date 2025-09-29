@@ -1,0 +1,201 @@
+name: release
+on:
+  push:
+    tags:
+    - 'v1.0.[0-9]+'
+    - 'v2.0.[0-9]+'
+
+jobs:
+  build-amd64:
+    name: osxcross (amd64)
+    runs-on: ubuntu-22.04
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Docker meta
+        id: meta-amd64
+        uses: docker/metadata-action@v5
+        with:
+          images: joseluisq/rust-linux-darwin-builder
+          flavor: |
+            latest=true
+            suffix=-amd64
+          tags: |
+            type=semver,pattern={{version}}
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v3 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          provenance: false
+          context: .
+          platforms: linux/amd64
+          file: ./docker/amd64/Dockerfile
+          tags: ${{ steps.meta-amd64.outputs.tags }}
+
+  build-arm64:
+    name: osxcross (arm64)
+    runs-on: ubuntu-22.04-arm
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Docker meta
+        id: meta-arm64
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            joseluisq/rust-linux-darwin-builder
+            ghcr.io/joseluisq/rust-linux-darwin-builder
+          flavor: |
+            latest=true
+            suffix=-arm64
+          tags: |
+            type=semver,pattern={{version}}
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v3 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          provenance: false
+          context: .
+          platforms: linux/arm64
+          file: ./docker/arm64/Dockerfile
+          tags: ${{ steps.meta-arm64.outputs.tags }}
+
+  manifest:
+    needs:
+      - build-amd64
+      - build-arm64
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set envs
+        run: |
+          github_ref=${GITHUB_REF#refs/tags/}
+          SEMVER=${github_ref##*v}
+          SEMVER_MAJOR=${SEMVER%.*.*}
+          SEMVER_MINOR=${SEMVER%.*}
+          echo "SEMVER=${SEMVER}" >> $GITHUB_ENV
+          echo "SEMVER_MAJOR=${SEMVER_MAJOR}" >> $GITHUB_ENV
+          echo "SEMVER_MINOR=${SEMVER_MINOR}" >> $GITHUB_ENV
+          echo $SEMVER
+          echo $SEMVER_MAJOR
+          echo $SEMVER_MINOR
+      -
+        name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v3 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Pull all images
+        run: |
+          docker pull joseluisq/rust-linux-darwin-builder:$SEMVER-amd64
+          docker pull joseluisq/rust-linux-darwin-builder:$SEMVER-arm64
+
+          docker pull ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-amd64
+          docker pull ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-arm64
+      -
+        name: Push semver minor alias
+        run: |
+          docker manifest create \
+            joseluisq/rust-linux-darwin-builder:$SEMVER_MINOR \
+              --amend joseluisq/rust-linux-darwin-builder:$SEMVER-amd64 \
+              --amend joseluisq/rust-linux-darwin-builder:$SEMVER-arm64
+          docker manifest push joseluisq/rust-linux-darwin-builder:$SEMVER_MINOR
+
+          docker manifest create \
+            ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER_MINOR \
+              --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-amd64 \
+              --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-arm64
+          docker manifest push ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER_MINOR
+      -
+        name: Push latest (1.0 or newer)
+        run: |
+          docker manifest create \
+            joseluisq/rust-linux-darwin-builder:latest \
+              --amend joseluisq/rust-linux-darwin-builder:$SEMVER-amd64 \
+              --amend joseluisq/rust-linux-darwin-builder:$SEMVER-arm64
+          docker manifest push joseluisq/rust-linux-darwin-builder:latest
+
+          docker manifest create \
+            ghcr.io/joseluisghcr.io/q/rust-linux-darwin-builder:latest \
+              --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-amd64 \
+              --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-arm64
+          docker manifest push ghcr.io/joseluisq/rust-linux-darwin-builder:latest
+      -
+        name: Push semver alias
+        run: |
+          docker manifest create \
+            joseluisq/rust-linux-darwin-builder:$SEMVER \
+              --amend joseluisq/rust-linux-darwin-builder:$SEMVER-amd64 \
+              --amend joseluisq/rust-linux-darwin-builder:$SEMVER-arm64
+          docker manifest push joseluisq/rust-linux-darwin-builder:$SEMVER
+
+          docker manifest create \
+            ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER \
+              --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-amd64 \
+              --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-arm64
+          docker manifest push ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER
+      -
+        name: Push semver major alias (1.0 or newer)
+        run: |
+          docker manifest create \
+            joseluisq/rust-linux-darwin-builder:$SEMVER_MAJOR \
+              --amend joseluisq/rust-linux-darwin-builder:$SEMVER-amd64 \
+              --amend joseluisq/rust-linux-darwin-builder:$SEMVER-arm64
+          docker manifest push joseluisq/rust-linux-darwin-builder:$SEMVER_MAJOR
+
+          docker manifest create \
+            ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER_MAJOR \
+              --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-amd64 \
+              --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-arm64
+          docker manifest push ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER_MAJOR

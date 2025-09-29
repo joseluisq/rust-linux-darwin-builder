@@ -93,10 +93,6 @@ RUN set -eux \
     && curl -LO "https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz" \
     && true
 
-# We point /usr/local/musl/include/linux at some Linux kernel headers (not
-# necessarily the right ones) in an effort to compile OpenSSL 1.1's "engine"
-# component. It's possible that this will cause bizarre and terrible things to
-# happen. There may be "sanitized" header
 RUN set -eux \
     && tar xvzf "openssl-${OPENSSL_VERSION}.tar.gz" \
     && cd "openssl-${OPENSSL_VERSION}" \
@@ -138,9 +134,6 @@ RUN set -eux \
     && echo "Building OpenSSL ${OPENSSL_VERSION} for aarch64..." \
     && ls /usr/include/linux \
     && mkdir -p /usr/local/aarch64-linux-gnu/include \
-    # && ln -s /usr/include/linux /usr/local/aarch64-linux-gnu/include/linux \
-    # && ln -s "/usr/include/aarch64-linux-gnu/asm" /usr/local/aarch64-linux-gnu/include/asm \
-    # && ln -s /usr/include/asm-generic /usr/local/aarch64-linux-gnu/include/asm-generic \
     && env CC=aarch64-linux-gnu-gcc ./Configure no-shared no-zlib \
         -fPIC --prefix=/usr/local/aarch64-linux-gnu \
         -DOPENSSL_NO_SECURE_MEMORY -mno-outline-atomics "linux-aarch64" \
@@ -159,6 +152,44 @@ RUN set -eux \
     && true
 
 RUN set -eux \
+    && tar xvzf "openssl-${OPENSSL_VERSION}.tar.gz" \
+    && cd "openssl-${OPENSSL_VERSION}" \
+    && echo "Building OpenSSL ${OPENSSL_VERSION} for MACOS aarch64..." \
+    && mkdir -p /usr/local/aarch64-apple-darwin/include \
+    && env CC=oa64-clang \
+        ./Configure no-asm no-shared no-zlib no-tests no-fuzz-libfuzzer no-fuzz-afl \
+        -fPIC --prefix=/usr/local/aarch64-apple-darwin \
+        -DOPENSSL_NO_SECURE_MEMORY "darwin64-arm64-cc" \
+    && make -j$(nproc) build_libs \
+    && make -j$(nproc) install_dev \
+    && rm -rf \
+        /usr/local/aarch64-apple-darwin/include/asm \
+        /usr/local/aarch64-apple-darwin/include/asm-generic \
+    && ls -l /usr/local/aarch64-apple-darwin \
+    && cd .. \
+    && rm -rf "openssl-${OPENSSL_VERSION}" \
+    && true
+
+RUN set -eux \
+    && tar xvzf "openssl-${OPENSSL_VERSION}.tar.gz" \
+    && cd "openssl-${OPENSSL_VERSION}" \
+    && echo "Building OpenSSL ${OPENSSL_VERSION} for MACOS x86_64..." \
+    && mkdir -p /usr/local/x86_64-apple-darwin/include \
+    && env CC=o64-clang \
+        ./Configure no-asm no-shared no-zlib no-tests no-fuzz-libfuzzer no-fuzz-afl \
+        -fPIC --prefix=/usr/local/x86_64-apple-darwin \
+        -DOPENSSL_NO_SECURE_MEMORY "darwin64-x86_64-cc" \
+    && make -j$(nproc) build_libs \
+    && make -j$(nproc) install_dev \
+    && rm -rf \
+        /usr/local/x86_64-apple-darwin/include/asm \
+        /usr/local/x86_64-apple-darwin/include/asm-generic \
+    && ls -l /usr/local/x86_64-apple-darwin \
+    && cd .. \
+    && rm -rf "openssl-${OPENSSL_VERSION}" \
+    && true
+
+RUN set -eux \
     && echo "Testing musl-gcc with OpenSSL..." \
     && openssl version \
     && echo "int main(){return 0;}" | \
@@ -171,10 +202,12 @@ RUN set -eux \
 WORKDIR /root
 
 # OpenSSL related environment variables
-ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/x86_64-linux-musl
-ENV AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/aarch64-linux-gnu
 ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_STATIC=1
+ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/x86_64-linux-musl
+ENV X86_64_APPLE_DARWIN_OPENSSL_DIR=/usr/local/x86_64-apple-darwin
 ENV AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_STATIC=1
+ENV AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/aarch64-linux-gnu
+ENV AARCH64_APPLE_DARWIN_OPENSSL_DIR=/usr/local/aarch64-apple-darwin
 
 # pkg-config related environment variables
 ENV PKG_CONFIG_ALLOW_CROSS=true \

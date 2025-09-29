@@ -9,29 +9,6 @@ build:
 		-f Dockerfile .
 .PHONY: build
 
-build-osxcross:
-	docker build \
-		-t $(REPOSITORY)/rust-linux-darwin-builder:osxcross \
-		--network=host \
-		-f Dockerfile .
-.PHONY: build-osxcross
-
-build-cross:
-	docker build \
-		-t $(REPOSITORY)/rust-linux-darwin-builder:cross \
-		--network=host \
-		-f Dockerfile.cross .
-.PHONY: build-cross
-
-run-cross:
-	@docker run --rm -it \
-		-v $(PWD):/root/src \
-		-v $(PWD)/cargo/config.toml:/root/.cargo/config.toml \
-		-w /root/src \
-			$(REPOSITORY)/rust-linux-darwin-builder:cross \
-				bash
-.PHONY: run-cross
-
 # Use to build both arm64 and amd64 images at the same time.
 # WARNING! Will automatically push, since multi-platform images are not available locally.
 # Use `REPOSITORY` arg to specify which container repository to push the images to.
@@ -50,6 +27,7 @@ buildx:
 run:
 	@docker run --rm -it \
 		-v $(PWD):/root/src \
+		-v $(PWD)/cargo/config.toml:/root/.cargo/config.toml \
 		-w /root/src \
 			$(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
 				bash
@@ -60,10 +38,10 @@ test:
 		-v $(PWD):/root/src \
 		-w /root/src \
 			$(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
-				bash -c 'set -eu; make test-ci; make test-openssl'
+				bash -c 'set -eu; make test-app; make test-zlib; make test-openssl'
 .PHONY: test
 
-test-ci:
+test-app:
 	@echo "Checking Debian version..."
 	@cat /etc/debian_version
 	@echo
@@ -116,7 +94,7 @@ test-ci:
 		&& cargo build --release --target aarch64-apple-darwin \
 		&& du -sh target/aarch64-apple-darwin/release/hello-world-test \
 		&& file target/aarch64-apple-darwin/release/hello-world-test
-.ONESHELL: test-ci
+.ONESHELL: test-app
 
 test-zlib:
 	@echo "Checking Debian version..."
@@ -193,7 +171,8 @@ test-openssl:
 			echo; \
 \
 			echo "Compiling application (linux-musl x86_64)..."; \
-			cargo build --release --target x86_64-unknown-linux-musl; \
+			OPENSSL_STATIC=1 \
+				cargo build --release --target x86_64-unknown-linux-musl; \
 			target/x86_64-unknown-linux-musl/release/openssl; \
 			du -sh target/x86_64-unknown-linux-musl/release/openssl; \
 			file target/x86_64-unknown-linux-musl/release/openssl; \
@@ -209,22 +188,17 @@ test-openssl:
 		&& echo \
 \
 		&& echo "Cross-compiling application (linux-musl aarch64)..." \
-		&& cargo build --release --target aarch64-unknown-linux-musl \
-		&& if [ "$$(uname -m)" = "arm64" ]; then \
-			target/aarch64-unknown-linux-musl/release/openssl; \
-		fi \
+		&& OPENSSL_STATIC=1 \
+			cargo build --release --target aarch64-unknown-linux-musl \
 		&& du -sh target/aarch64-unknown-linux-musl/release/openssl \
 		&& file target/aarch64-unknown-linux-musl/release/openssl \
 		&& echo \
 \
 		&& echo "Cross-compiling application (apple-darwin aarch64)..." \
-		&& CC=oa64-clang CXX=oa64-clang++ \
+		&& OPENSSL_STATIC=1 \
+			CC=oa64-clang CXX=oa64-clang++ \
 				cargo build --release --target aarch64-apple-darwin \
-		&& if [ "$$(uname -m)" = "arm64" ]; then \
-			target/aarch64-apple-darwin/release/openssl; \
-		fi \
 		&& du -sh target/aarch64-apple-darwin/release/openssl \
 		&& file target/aarch64-apple-darwin/release/openssl \
 		&& echo \
-		&& echo "Cross-compiling done."
 .ONESHELL: test-openssl
