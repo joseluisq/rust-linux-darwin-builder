@@ -1,4 +1,4 @@
-FROM joseluisq/docker-osxcross:1.0.0-beta.1
+FROM joseluisq/docker-osxcross:1.0.0-beta.2
 
 ARG VERSION=0.0.0
 ENV VERSION=${VERSION}
@@ -45,6 +45,23 @@ RUN set -eux \
 
 ##### Libraries
 
+# pkg-config related environment variables
+ENV PKG_CONFIG_ALLOW_CROSS=true
+ENV PKG_CONFIG_ALL_STATIC=true
+
+RUN set -eux \
+    && dpkg --add-architecture arm64 \
+    && DEBIAN_FRONTEND=noninteractive apt-get update -qq \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends --no-install-suggests \
+        musl-dev \
+        musl-dev:arm64 \
+        musl-tools \
+        gcc-aarch64-linux-gnu \
+        g++-aarch64-linux-gnu \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && true
+
 # zlib - http://zlib.net/
 ARG ZLIB_VERSION=1.3.1
 
@@ -52,42 +69,52 @@ WORKDIR /tmp
 
 RUN set -eux \
     && echo "Downloading zlib ${ZLIB_VERSION}..." \
-    && cd /tmp \
-    && curl -LO "https://www.zlib.net/fossils/zlib-${ZLIB_VERSION}.tar.gz" \
-    && tar xzf "zlib-${ZLIB_VERSION}.tar.gz" \
-    && rm -rf "zlib-${ZLIB_VERSION}.tar.gz" \
+    && curl -Lo zlib.tar.gz "https://www.zlib.net/fossils/zlib-${ZLIB_VERSION}.tar.gz" \
     && true
     
-WORKDIR /tmp/zlib-${ZLIB_VERSION}
-
 # x86_64 glibc
 RUN set -eux \
+    && mkdir zlib \
+    && tar -xvf zlib.tar.gz --strip-components=1 -C ./zlib \
+    && cd zlib \
     && make distclean \
     && CC=gcc ./configure --prefix=/usr/local/x86_64-linux-gnu \
     && make -j$(nproc) \
     && make install \
+    && cd .. \
+    && rm -rf zlib \
     && true
 
 # arm64 glibc
 RUN set -eux \
+    && mkdir zlib \
+    && tar -xvf zlib.tar.gz --strip-components=1 -C ./zlib \
+    && cd zlib \
     && make distclean \
     && CC=aarch64-linux-gnu-gcc ./configure --prefix=/usr/local/aarch64-linux-gnu \
     && make -j$(nproc) \
     && make install \
+    && cd .. \
+    && rm -rf zlib \
     && true
 
 # x86_64 musl
 RUN set -eux \
+    && mkdir zlib \
+    && tar -xvf zlib.tar.gz --strip-components=1 -C ./zlib \
+    && cd zlib \
     && make distclean \
     && CC=musl-gcc ./configure --static --prefix=/usr/local/x86_64-linux-musl \
     && make -j$(nproc) \
     && make install \
+    && cd .. \
+    && rm -rf zlib zlib.tar.gz \
     && true
 
 WORKDIR /tmp
 
-# OpenSSL 3.5.3 - https://github.com/openssl/openssl/releases
-ARG OPENSSL_VERSION=3.5.3
+# OpenSSL v3 - https://github.com/openssl/openssl/releases
+ARG OPENSSL_VERSION=3.5.4
 
 RUN set -eux \
     && curl -LO "https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}.tar.gz" \
@@ -190,6 +217,27 @@ RUN set -eux \
     && true
 
 RUN set -eux \
+    && tar xvzf "openssl-${OPENSSL_VERSION}.tar.gz" \
+    && cd "openssl-${OPENSSL_VERSION}" \
+    && echo "Building OpenSSL ${OPENSSL_VERSION} for aarch64 musl..." \
+    && mkdir -p /usr/local/aarch64-linux-musl/include \
+    && env CC=aarch64-linux-musl-gcc \
+        ./Configure no-asm no-engine no-shared no-zlib no-tests no-fuzz-libfuzzer no-fuzz-afl \
+        -fPIC --prefix=/usr/local/aarch64-linux-musl \
+        -DOPENSSL_NO_SECURE_MEMORY -mno-outline-atomics "linux-aarch64" \
+    && env C_INCLUDE_PATH=/usr/local/aarch64-linux-musl/include/ make depend \
+    && env C_INCLUDE_PATH=/usr/local/aarch64-linux-musl/include/ make -j$(nproc) \
+    && make -j$(nproc) install_sw \
+    && make -j$(nproc) install_ssldirs \
+    && rm -rf \
+        /usr/local/aarch64-linux-musl/include/asm \
+        /usr/local/aarch64-linux-musl/include/asm-generic \
+    && ls -l /usr/local/aarch64-linux-musl \
+    && cd .. \
+    && rm -rf "openssl-${OPENSSL_VERSION}" \
+    && true
+
+RUN set -eux \
     && echo "Testing musl-gcc with OpenSSL..." \
     && openssl version \
     && echo "int main(){return 0;}" | \
@@ -199,25 +247,23 @@ RUN set -eux \
             -lssl -lcrypto \
     && true
 
+RUN set -eux \
+    && echo "Removing temp files..." \
+    && rm -rf *~ taballs *.tar.xz \
+    && rm -rf /tmp/* \
+    && true
+
 WORKDIR /root
 
 # OpenSSL related environment variables
 ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_STATIC=1
 ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/x86_64-linux-musl
 ENV X86_64_APPLE_DARWIN_OPENSSL_DIR=/usr/local/x86_64-apple-darwin
+
 ENV AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_STATIC=1
-ENV AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/aarch64-linux-gnu
+ENV AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/aarch64-linux-musl
+ENV AARCH64_UNKNOWN_LINUX_GNU_OPENSSL_DIR=/usr/local/aarch64-linux-gnu
 ENV AARCH64_APPLE_DARWIN_OPENSSL_DIR=/usr/local/aarch64-apple-darwin
-
-# pkg-config related environment variables
-ENV PKG_CONFIG_ALLOW_CROSS=true \
-    PKG_CONFIG_ALL_STATIC=true
-
-RUN set -eux \
-    && echo "Removing temp files..." \
-    && rm -rf *~ taballs *.tar.xz \
-    && rm -rf /tmp/* \
-    && true
 
 WORKDIR /root/src
 

@@ -6,7 +6,7 @@ build:
 	docker build \
 		-t $(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
 		--network=host \
-		-f Dockerfile .
+		-f docker/amd64/Dockerfile .
 .PHONY: build
 
 # Use to build both arm64 and amd64 images at the same time.
@@ -50,21 +50,23 @@ test-app:
 	@echo
 	@cd tests/hello-world \
 \
+		&& echo "Compiling application (linux-gnu x86_64)..." \
+		&& cargo build --release --target x86_64-unknown-linux-gnu \
 		&& if [ "$$(uname -m)" = "x86_64" ]; then \
-			echo "Compiling application (linux-gnu x86_64)..."; \
-			cargo build --release --target x86_64-unknown-linux-gnu; \
 			target/x86_64-unknown-linux-gnu/release/hello-world-test; \
-			du -sh target/x86_64-unknown-linux-gnu/release/hello-world-test; \
-			file target/x86_64-unknown-linux-gnu/release/hello-world-test; \
-			echo; \
-\
-			echo "Compiling application (linux-musl x86_64)..."; \
-			cargo build --release --target x86_64-unknown-linux-musl; \
-			target/x86_64-unknown-linux-musl/release/hello-world-test; \
-			du -sh target/x86_64-unknown-linux-musl/release/hello-world-test; \
-			file target/x86_64-unknown-linux-musl/release/hello-world-test; \
-			echo; \
 		fi \
+		&& du -sh target/x86_64-unknown-linux-gnu/release/hello-world-test \
+		&& file target/x86_64-unknown-linux-gnu/release/hello-world-test \
+		&& echo \
+\
+		&& echo "Compiling application (linux-musl x86_64)..." \
+		&& cargo build --release --target x86_64-unknown-linux-musl \
+		&& if [ "$$(uname -m)" = "x86_64" ]; then \
+			target/x86_64-unknown-linux-musl/release/hello-world-test; \
+		fi \
+		&& du -sh target/x86_64-unknown-linux-musl/release/hello-world-test \
+		&& file target/x86_64-unknown-linux-musl/release/hello-world-test \
+		&& echo \
 \
 		&& echo "Cross-compiling application (apple-darwin x86_64)..." \
 		&& cargo build --release --target x86_64-apple-darwin \
@@ -94,6 +96,7 @@ test-app:
 		&& cargo build --release --target aarch64-apple-darwin \
 		&& du -sh target/aarch64-apple-darwin/release/hello-world-test \
 		&& file target/aarch64-apple-darwin/release/hello-world-test
+		&& echo
 .ONESHELL: test-app
 
 test-zlib:
@@ -105,30 +108,34 @@ test-zlib:
 	@echo
 	@cd tests/zlib \
 \
-		&& if [ "$$(uname -m)" = "x86_64" ]; then \
-			echo "Compiling application (linux-gnu x86_64)..."; \
-			cargo build --release --target x86_64-unknown-linux-gnu; \
+		&& echo "Compiling application (linux-gnu x86_64)..." \
+		&& cargo build --release --target x86_64-unknown-linux-gnu \
+		&& if [ "$$(uname -m)" = "x86_64" ]; then
 			target/x86_64-unknown-linux-gnu/release/zlib-test; \
-			du -sh target/x86_64-unknown-linux-gnu/release/zlib-test; \
-			file target/x86_64-unknown-linux-gnu/release/zlib-test; \
-			echo; \
-\
-			echo "Compiling application (linux-musl x86_64)..."; \
-			cargo build --release --target x86_64-unknown-linux-musl; \
-			target/x86_64-unknown-linux-musl/release/zlib-test; \
-			du -sh target/x86_64-unknown-linux-musl/release/zlib-test; \
-			file target/x86_64-unknown-linux-musl/release/zlib-test; \
-			echo; \
 		fi \
+		&& du -sh target/x86_64-unknown-linux-gnu/release/zlib-test \
+		&& file target/x86_64-unknown-linux-gnu/release/zlib-test \
+		&& echo \
+\
+		&& echo "Compiling application (linux-musl x86_64)..." \
+		&& cargo build --release --target x86_64-unknown-linux-musl \
+		&& if [ "$$(uname -m)" = "x86_64" ]; then
+			target/x86_64-unknown-linux-musl/release/zlib-test; \
+		fi \
+		&& du -sh target/x86_64-unknown-linux-musl/release/zlib-test \
+		&& file target/x86_64-unknown-linux-musl/release/zlib-test \
+		&& echo \
 \
 		&& echo "Cross-compiling application (apple-darwin x86_64)..." \
-		&& LIBZ_SYS_STATIC=1 CC=o64-clang CXX=o64-clang++ \
+		&& CC=o64-clang CXX=o64-clang++ \
 			cargo build --release --target x86_64-apple-darwin \
 		&& du -sh target/x86_64-apple-darwin/release/zlib-test \
 		&& file target/x86_64-apple-darwin/release/zlib-test \
+		&& echo \
 \
 		&& echo "Cross-compiling application (linux-gnu aarch64)..." \
-		&& CC=aarch64-linux-gnu-gcc cargo build --release --target aarch64-unknown-linux-gnu \
+		&& CC=aarch64-linux-gnu-gcc \
+			cargo build --release --target aarch64-unknown-linux-gnu \
 		&& if [ "$$(uname -m)" = "aarch64" ]; then \
 			target/aarch64-unknown-linux-gnu/release/zlib-test; \
 		fi \
@@ -146,7 +153,7 @@ test-zlib:
 		&& echo \
 \
 		&& echo "Cross-compiling application (apple-darwin aarch64)..." \
-		&& LIBZ_SYS_STATIC=1 CC=oa64-clang CXX=oa64-clang++ \
+		&& CC=oa64-clang CXX=oa64-clang++ \
 			cargo build --release --target aarch64-apple-darwin \
 		&& du -sh target/aarch64-apple-darwin/release/zlib-test \
 		&& file target/aarch64-apple-darwin/release/zlib-test
@@ -162,27 +169,39 @@ test-openssl:
 	@echo
 	@cd tests/openssl \
 \
+		&& echo "Compiling application (linux-gnu x86_64)..." \
+		&& cargo build --release --target x86_64-unknown-linux-gnu \
 		&& if [ "$$(uname -m)" = "x86_64" ]; then \
-			echo "Compiling application (linux-gnu x86_64)..."; \
-			cargo build --release --target x86_64-unknown-linux-gnu; \
 			target/x86_64-unknown-linux-gnu/release/openssl; \
-			du -sh target/x86_64-unknown-linux-gnu/release/openssl; \
-			file target/x86_64-unknown-linux-gnu/release/openssl; \
-			echo; \
-\
-			echo "Compiling application (linux-musl x86_64)..."; \
-			OPENSSL_STATIC=1 \
-				cargo build --release --target x86_64-unknown-linux-musl; \
-			target/x86_64-unknown-linux-musl/release/openssl; \
-			du -sh target/x86_64-unknown-linux-musl/release/openssl; \
-			file target/x86_64-unknown-linux-musl/release/openssl; \
-			echo; \
 		fi \
+		&& du -sh target/x86_64-unknown-linux-gnu/release/openssl \
+		&& file target/x86_64-unknown-linux-gnu/release/openssl \
+		&& echo \
+\
+		&& echo "Cross-compiling application (linux-gnu aarch64)..." \
+		&& CC=aarch64-linux-gnu-gcc \
+			cargo build --release --target aarch64-unknown-linux-gnu \
+		&& if [ "$$(uname -m)" = "aarch64" ]; then \
+			target/aarch64-unknown-linux-gnu/release/openssl; \
+		fi \
+		&& du -sh target/aarch64-unknown-linux-gnu/release/openssl \
+		&& file target/aarch64-unknown-linux-gnu/release/openssl \
+		&& echo \
+\
+		&& echo "Compiling application (linux-musl x86_64)..." \
+		&& OPENSSL_STATIC=1 \
+			cargo build --release --target x86_64-unknown-linux-musl \
+		&& if [ "$$(uname -m)" = "x86_64" ]; then \
+			target/x86_64-unknown-linux-musl/release/openssl; \
+		fi \
+		&& du -sh target/x86_64-unknown-linux-musl/release/openssl \
+		&& file target/x86_64-unknown-linux-musl/release/openssl \
+		&& echo \
 \
 		&& echo "Cross-compiling application (apple-darwin x86_64)..." \
 		&& OPENSSL_STATIC=1 \
 			CC=o64-clang CXX=o64-clang++ \
-			cargo build --release --target x86_64-apple-darwin \
+				cargo build --release --target x86_64-apple-darwin \
 		&& du -sh target/x86_64-apple-darwin/release/openssl \
 		&& file target/x86_64-apple-darwin/release/openssl \
 		&& echo \
@@ -190,6 +209,9 @@ test-openssl:
 		&& echo "Cross-compiling application (linux-musl aarch64)..." \
 		&& OPENSSL_STATIC=1 \
 			cargo build --release --target aarch64-unknown-linux-musl \
+		&& if [ "$$(uname -m)" = "aarch64" ]; then \
+			target/aarch64-unknown-linux-musl/release/openssl;
+		fi \
 		&& du -sh target/aarch64-unknown-linux-musl/release/openssl \
 		&& file target/aarch64-unknown-linux-musl/release/openssl \
 		&& echo \
@@ -200,5 +222,6 @@ test-openssl:
 				cargo build --release --target aarch64-apple-darwin \
 		&& du -sh target/aarch64-apple-darwin/release/openssl \
 		&& file target/aarch64-apple-darwin/release/openssl \
-		&& echo \
+		&& echo
+
 .ONESHELL: test-openssl
