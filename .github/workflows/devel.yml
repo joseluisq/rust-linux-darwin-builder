@@ -76,18 +76,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=0.0.0
-      -
-        name: Build and push to local registry
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: linux/amd64
-          file: docker/amd64/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VERSION=0.0.0
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
       -
@@ -105,6 +93,7 @@ jobs:
         with:
             image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}"
             shell: bash
+            options: -v ${{ github.workspace }}:/root/src
             run: |
               set -eux
               cat /etc/debian_version
@@ -180,21 +169,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=0.0.0
-      -
-        name: Build and push to local registry
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: linux/arm64
-          file: docker/arm64/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VERSION=0.0.0
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-      
       -
         name: Inspect image
         run: |
@@ -210,6 +186,7 @@ jobs:
         with:
             image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}"
             shell: bash
+            options: -v ${{ github.workspace }}:/root/src
             run: |
               set -eux
               cat /etc/debian_version
