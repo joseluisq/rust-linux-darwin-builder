@@ -34,6 +34,7 @@ RUN set -eux \
         aarch64-unknown-linux-musl \
         x86_64-apple-darwin \
         x86_64-unknown-linux-musl \
+        x86_64-unknown-linux-gnu \
     && true
 
 COPY cargo/config.toml /root/.cargo/config.toml
@@ -44,10 +45,6 @@ RUN set -eux \
     && true
 
 ##### Libraries
-
-# pkg-config related environment variables
-ENV PKG_CONFIG_ALLOW_CROSS=true
-ENV PKG_CONFIG_ALL_STATIC=true
 
 RUN set -eux \
     && dpkg --add-architecture amd64 \
@@ -71,7 +68,7 @@ RUN set -eux \
     && echo "Downloading zlib ${ZLIB_VERSION}..." \
     && curl -Lo zlib.tar.gz "https://www.zlib.net/fossils/zlib-${ZLIB_VERSION}.tar.gz" \
     && true
-    
+
 # x86_64 glibc
 RUN set -eux \
     && mkdir zlib \
@@ -251,6 +248,10 @@ RUN set -eux \
     && true
 
 WORKDIR /root
+
+# pkg-config related environment variables
+ENV PKG_CONFIG_ALLOW_CROSS=true
+ENV PKG_CONFIG_ALL_STATIC=true
 
 # OpenSSL related environment variables
 ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_STATIC=1
