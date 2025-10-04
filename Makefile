@@ -2,12 +2,20 @@ REPOSITORY ?= joseluisq
 TAG ?= latest
 
 
-build:
+build-amd64:
 	docker build \
-		-t $(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
+		-t $(REPOSITORY)/rust-linux-darwin-builder:$(TAG)-amd64 \
 		--network=host \
 		-f docker/amd64/Dockerfile .
-.PHONY: build
+.PHONY: build-amd64
+
+build-arm64:
+	docker buildx build \
+		-t $(REPOSITORY)/rust-linux-darwin-builder:$(TAG)-arm64 \
+		--network=host \
+		--platform linux/arm64 \
+		-f docker/arm64/Dockerfile .
+.PHONY: build-arm64
 
 # Use to build both arm64 and amd64 images at the same time.
 # WARNING! Will automatically push, since multi-platform images are not available locally.
@@ -95,7 +103,7 @@ test-app:
 		&& echo "Cross-compiling application (apple-darwin aarch64)..." \
 		&& cargo build --release --target aarch64-apple-darwin \
 		&& du -sh target/aarch64-apple-darwin/release/hello-world-test \
-		&& file target/aarch64-apple-darwin/release/hello-world-test
+		&& file target/aarch64-apple-darwin/release/hello-world-test \
 		&& echo
 .ONESHELL: test-app
 
@@ -156,7 +164,8 @@ test-zlib:
 		&& CC=oa64-clang CXX=oa64-clang++ \
 			cargo build --release --target aarch64-apple-darwin \
 		&& du -sh target/aarch64-apple-darwin/release/zlib-test \
-		&& file target/aarch64-apple-darwin/release/zlib-test
+		&& file target/aarch64-apple-darwin/release/zlib-test \
+		&& echo \
 
 .ONESHELL: test-zlib
 
