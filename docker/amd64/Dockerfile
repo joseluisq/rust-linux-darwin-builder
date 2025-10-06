@@ -37,7 +37,7 @@ RUN set -eux \
         x86_64-unknown-linux-gnu \
     && true
 
-COPY cargo/config.toml /root/.cargo/config.toml
+COPY docker/amd64/cargo.toml /root/.cargo/config.toml
 
 RUN set -eux \
     && rustc -vV \
@@ -259,6 +259,7 @@ ENV PKG_CONFIG_ALL_STATIC=true
 # OpenSSL related environment variables
 ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_STATIC=1
 ENV X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/x86_64-linux-musl
+ENV X86_64_UNKNOWN_LINUX_GNU_OPENSSL_DIR=/usr/local/x86_64-linux-musl
 ENV X86_64_APPLE_DARWIN_OPENSSL_DIR=/usr/local/x86_64-apple-darwin
 
 ENV AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_STATIC=1

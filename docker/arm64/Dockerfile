@@ -37,7 +37,7 @@ RUN set -eux \
         x86_64-unknown-linux-gnu \
     && true
 
-COPY cargo/config.toml /root/.cargo/config.toml
+COPY docker/arm64/cargo.toml /root/.cargo/config.toml
 
 RUN set -eux \
     && rustc -vV \
@@ -200,36 +200,35 @@ RUN set -eux \
     && rm -rf "openssl-${OPENSSL_VERSION}" \
     && true
 
-# TODO:
-# RUN set -eux \
-#     && tar xvzf "openssl-${OPENSSL_VERSION}.tar.gz" \
-#     && cd "openssl-${OPENSSL_VERSION}" \
-#     && echo "Building OpenSSL ${OPENSSL_VERSION} for x86_64..." \
-#     && mkdir -p /usr/local/x86_64-linux-musl/include \
-#     && ln -s "/usr/include/x86_64-linux-gnu/asm" /usr/local/x86_64-linux-musl/include/asm \
-#     && env CC=x86_64-linux-musl-gcc \
-#         ./Configure no-asm no-shared no-zlib no-tests no-fuzz-libfuzzer no-fuzz-afl \
-#         -fPIC --prefix=/usr/local/x86_64-linux-musl \
-#         -DOPENSSL_NO_SECURE_MEMORY "linux-x86_64" \
-#     && env C_INCLUDE_PATH=/usr/local/x86_64-linux-musl/include/ make depend \
-#     && env C_INCLUDE_PATH=/usr/local/x86_64-linux-musl/include/ make -j$(nproc) \
-#     && make -j$(nproc) install_sw \
-#     && make -j$(nproc) install_ssldirs \
-#     && rm -rf \
-#         /usr/local/x86_64-linux-musl/include/asm \
-#     && ls -l /usr/local/x86_64-linux-musl \
-#     && if ! [ -d /usr/local/x86_64-linux-musl/lib ]; then \
-#             ln -s /usr/local/x86_64-linux-musl/lib64 /usr/local/x86_64-linux-musl/lib; \
-#         else \
-#             mv /usr/local/x86_64-linux-musl/lib /usr/local/x86_64-linux-musl/abc; \
-#             mv /usr/local/x86_64-linux-musl/lib64 /usr/local/x86_64-linux-musl/lib; \
-#             cp -rp /usr/local/x86_64-linux-musl/abc/. /usr/local/x86_64-linux-musl/lib/; \
-#             unlink /usr/local/x86_64-linux-musl/lib/lib64; \
-#             rm -rf /usr/local/x86_64-linux-musl/abc; \
-#         fi \
-#     && cd .. \
-#     && rm -rf "openssl-${OPENSSL_VERSION}" \
-#     && true
+RUN set -eux \
+    && tar xvzf "openssl-${OPENSSL_VERSION}.tar.gz" \
+    && cd "openssl-${OPENSSL_VERSION}" \
+    && echo "Building OpenSSL ${OPENSSL_VERSION} for x86_64..." \
+    && mkdir -p /usr/local/x86_64-linux-musl/include \
+    && ln -s "/usr/include/x86_64-linux-gnu/asm" /usr/local/x86_64-linux-musl/include/asm \
+    && env CC=x86_64-linux-musl-gcc \
+        ./Configure no-asm no-shared no-zlib no-tests no-fuzz-libfuzzer no-fuzz-afl \
+        -fPIC --prefix=/usr/local/x86_64-linux-musl \
+        -DOPENSSL_NO_SECURE_MEMORY "linux-x86_64" \
+    && env C_INCLUDE_PATH=/usr/local/x86_64-linux-musl/include/ make depend \
+    && env C_INCLUDE_PATH=/usr/local/x86_64-linux-musl/include/ make -j$(nproc) \
+    && make -j$(nproc) install_sw \
+    && make -j$(nproc) install_ssldirs \
+    && rm -rf \
+        /usr/local/x86_64-linux-musl/include/asm \
+    && ls -l /usr/local/x86_64-linux-musl \
+    && if ! [ -d /usr/local/x86_64-linux-musl/lib ]; then \
+            ln -s /usr/local/x86_64-linux-musl/lib64 /usr/local/x86_64-linux-musl/lib; \
+        else \
+            mv /usr/local/x86_64-linux-musl/lib /usr/local/x86_64-linux-musl/abc; \
+            mv /usr/local/x86_64-linux-musl/lib64 /usr/local/x86_64-linux-musl/lib; \
+            cp -rp /usr/local/x86_64-linux-musl/abc/. /usr/local/x86_64-linux-musl/lib/; \
+            unlink /usr/local/x86_64-linux-musl/lib/lib64; \
+            rm -rf /usr/local/x86_64-linux-musl/abc; \
+        fi \
+    && cd .. \
+    && rm -rf "openssl-${OPENSSL_VERSION}" \
+    && true
 
 RUN set -eux \
     && echo "Testing musl-gcc with OpenSSL..." \
@@ -261,7 +260,7 @@ ENV X86_64_APPLE_DARWIN_OPENSSL_DIR=/usr/local/x86_64-apple-darwin
 
 ENV AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_STATIC=1
 ENV AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=/usr/local/aarch64-linux-musl
-ENV AARCH64_UNKNOWN_LINUX_GNU_OPENSSL_DIR=/usr/local/aarch64-linux-gnu
+ENV AARCH64_UNKNOWN_LINUX_GNU_OPENSSL_DIR=/usr/local/aarch64-linux-musl
 ENV AARCH64_APPLE_DARWIN_OPENSSL_DIR=/usr/local/aarch64-apple-darwin
 
 WORKDIR /root/src

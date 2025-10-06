@@ -1,6 +1,6 @@
 *
 
-!cargo
+!docker
 !Dockerfile
 !Makefile
 !scripts
