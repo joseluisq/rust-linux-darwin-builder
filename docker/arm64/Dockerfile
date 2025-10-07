@@ -207,7 +207,7 @@ RUN set -eux \
     && mkdir -p /usr/local/x86_64-linux-musl/include \
     && ln -s "/usr/include/x86_64-linux-gnu/asm" /usr/local/x86_64-linux-musl/include/asm \
     && env CC=x86_64-linux-musl-gcc \
-        ./Configure no-asm no-shared no-zlib no-tests no-fuzz-libfuzzer no-fuzz-afl \
+        ./Configure no-asm no-engine no-shared no-zlib no-tests no-fuzz-libfuzzer no-fuzz-afl \
         -fPIC --prefix=/usr/local/x86_64-linux-musl \
         -DOPENSSL_NO_SECURE_MEMORY "linux-x86_64" \
     && env C_INCLUDE_PATH=/usr/local/x86_64-linux-musl/include/ make depend \

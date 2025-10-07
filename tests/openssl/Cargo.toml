@@ -1,8 +1,8 @@
 [package]
-name = "openssl"
+name = "openssl-test"
 version = "0.0.0"
 authors = ["Jose Quintana <https://github.com/joseluisq>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 openssl = { version = "0.10.73" }

@@ -1,5 +1,5 @@
 [package]
-name = "hello-world-test"
+name = "app-test"
 version = "0.0.0"
 authors = ["Jose Quintana <https://github.com/joseluisq>"]
 edition = "2021"
