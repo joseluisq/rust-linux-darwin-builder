@@ -1,18 +1,5 @@
 FROM joseluisq/rust-linux-darwin-builder:v2.0.0-beta.1
 
-RUN set -eux \
-    && dpkg --add-architecture arm64 \
-    && DEBIAN_FRONTEND=noninteractive apt-get update -qq \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends --no-install-suggests \
-        musl-dev \
-        musl-dev:arm64 \
-        musl-tools \
-        gcc-aarch64-linux-gnu \
-        g++-aarch64-linux-gnu \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && true
-
 # zlib - http://zlib.net/
 ARG ZLIB_VERSION=1.3.1
 # Crate-related environment variables

@@ -54,7 +54,7 @@ jobs:
           provenance: false
           context: .
           platforms: linux/amd64
-          file: ./docker/amd64/Dockerfile
+          file: ./docker/amd64/base/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
 
   build-arm64:
@@ -105,7 +105,7 @@ jobs:
           provenance: false
           context: .
           platforms: linux/arm64
-          file: ./docker/arm64/Dockerfile
+          file: ./docker/arm64/base/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
 
   manifest:

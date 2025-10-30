@@ -10,6 +10,19 @@ LABEL version="${VERSION}" \
     description="Use same Docker image for compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
     maintainer="Jose Quintana <joseluisq.net>"
 
+RUN set -eux \
+    && dpkg --add-architecture arm64 \
+    && DEBIAN_FRONTEND=noninteractive apt-get update -qq \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends --no-install-suggests \
+        musl-dev \
+        musl-dev:arm64 \
+        musl-tools \
+        gcc-aarch64-linux-gnu \
+        g++-aarch64-linux-gnu \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && true
+
 # Static linking for C++ code
 RUN set -eux \
     && ln -s "/usr/bin/g++" "/usr/bin/musl-g++" \
