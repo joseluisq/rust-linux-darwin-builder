@@ -4,10 +4,9 @@ TAG ?= devel
 # AMD64 Tasks
 
 amd64-build:
-	docker buildx build \
+	docker build \
 		-t $(REPOSITORY):$(TAG)-amd64 \
 		--network=host \
-		--platform linux/amd64 \
 		-f docker/amd64/base/Dockerfile .
 .PHONY: amd64-build
 
@@ -29,17 +28,16 @@ amd64-test:
 .PHONY: amd64-test
 
 amd64-build-libs:
-	docker buildx build \
+	docker build \
 		-t $(REPOSITORY):$(TAG)-amd64-libs \
 		--network=host \
-		--platform linux/amd64 \
 		-f docker/amd64/libs/Dockerfile .
 .PHONY: amd64-build-libs
 
 amd64-run-libs:
 	@docker run --rm -it \
 		-v $(PWD):/root/src \
-		-v $(PWD)/docker/amd64/libs/cargo.toml:/root/.cargo/config.toml \
+		-v $(PWD)/docker/amd64/base/cargo.toml:/root/.cargo/config.toml \
 		-w /root/src \
 			$(REPOSITORY):$(TAG)-amd64-libs \
 				bash
@@ -57,10 +55,9 @@ amd64-test-libs:
 # ARM64 Tasks
 
 arm64-build:
-	docker buildx build \
+	docker build \
 		-t $(REPOSITORY):$(TAG)-arm64 \
 		--network=host \
-		--platform linux/arm64 \
 		-f docker/arm64/base/Dockerfile .
 .PHONY: arm64-build
 
@@ -73,10 +70,9 @@ arm64-test:
 .PHONY: arm64-test
 
 arm64-build-libs:
-	docker buildx build \
+	docker build \
 		-t $(REPOSITORY):$(TAG)-arm64-libs \
 		--network=host \
-		--platform linux/arm64 \
 		-f docker/arm64/libs/Dockerfile .
 .PHONY: arm64-build-libs
 
