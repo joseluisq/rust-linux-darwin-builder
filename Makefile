@@ -1,61 +1,104 @@
-REPOSITORY ?= joseluisq
-TAG ?= latest
+REPOSITORY ?= joseluisq/rust-linux-darwin-builder
+TAG ?= devel
 
-build-amd64:
-	docker build \
-		-t $(REPOSITORY)/rust-linux-darwin-builder:$(TAG)-amd64 \
+# AMD64 Tasks
+
+amd64-build:
+	docker buildx build \
+		-t $(REPOSITORY):$(TAG)-amd64 \
 		--network=host \
-		-f docker/amd64/Dockerfile .
-.PHONY: build-amd64
+		--platform linux/amd64 \
+		-f docker/amd64/base/Dockerfile .
+.PHONY: amd64-build
 
-run-amd64:
+amd64-run:
 	@docker run --rm -it \
 		-v $(PWD):/root/src \
-		-v $(PWD)/docker/amd64/cargo.toml:/root/.cargo/config.toml \
+		-v $(PWD)/docker/amd64/base/cargo.toml:/root/.cargo/config.toml \
 		-w /root/src \
-			$(REPOSITORY)/rust-linux-darwin-builder:$(TAG)-amd64 \
+			$(REPOSITORY):$(TAG)-amd64 \
 				bash
-.PHONY: run-amd64
+.PHONY: amd64-run
 
-build-arm64:
-	docker buildx build \
-		-t $(REPOSITORY)/rust-linux-darwin-builder:$(TAG)-arm64 \
-		--network=host \
-		--platform linux/arm64 \
-		-f docker/arm64/Dockerfile .
-.PHONY: build-arm64
-
-run-arm64:
-	@docker run --rm -it \
-		-v $(PWD):/root/src \
-		-v $(PWD)/docker/arm64/cargo.toml:/root/.cargo/config.toml \
-		-w /root/src \
-			$(REPOSITORY)/rust-linux-darwin-builder:$(TAG)-arm64 \
-				bash
-.PHONY: run-arm64
-
-# Use to build both arm64 and amd64 images at the same time.
-# WARNING! Will automatically push, since multi-platform images are not available locally.
-# Use `REPOSITORY` arg to specify which container repository to push the images to.
-buildx:
-	docker run --privileged --rm tonistiigi/binfmt --install linux/amd64,linux/arm64
-	docker buildx create --name darwin-builder --driver docker-container --bootstrap
-	docker buildx use darwin-builder
-	docker buildx build \
-		--platform linux/amd64,linux/arm64 \
-		--push \
-		-t $(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
-		-f Dockerfile .
-
-.PHONY: buildx
-
-test:
+amd64-test:
 	@docker run --rm \
 		-v $(PWD):/root/src \
 		-w /root/src \
-			$(REPOSITORY)/rust-linux-darwin-builder:$(TAG) \
-				bash -c 'set -eu; make test-app; make test-zlib; make test-openssl'
-.PHONY: test
+			$(REPOSITORY):$(TAG)-amd64 \
+				bash -c 'set -eu; test-app'
+.PHONY: amd64-test
+
+amd64-build-libs:
+	docker buildx build \
+		-t $(REPOSITORY):$(TAG)-amd64-libs \
+		--network=host \
+		--platform linux/amd64 \
+		-f docker/amd64/libs/Dockerfile .
+.PHONY: amd64-build-libs
+
+amd64-run-libs:
+	@docker run --rm -it \
+		-v $(PWD):/root/src \
+		-v $(PWD)/docker/amd64/libs/cargo.toml:/root/.cargo/config.toml \
+		-w /root/src \
+			$(REPOSITORY):$(TAG)-amd64-libs \
+				bash
+.PHONY: amd64-run-libs
+
+amd64-test-libs:
+	@docker run --rm \
+		-v $(PWD):/root/src \
+		-w /root/src \
+			$(REPOSITORY):$(TAG)-amd64-libs \
+				bash -c 'set -eu; test-all'
+.PHONY: amd64-test-libs
+
+
+# ARM64 Tasks
+
+arm64-build:
+	docker buildx build \
+		-t $(REPOSITORY):$(TAG)-arm64 \
+		--network=host \
+		--platform linux/arm64 \
+		-f docker/arm64/base/Dockerfile .
+.PHONY: arm64-build
+
+arm64-test:
+	@docker run --rm \
+		-v $(PWD):/root/src \
+		-w /root/src \
+			$(REPOSITORY):$(TAG)-arm64 \
+				bash -c 'set -eu; test-app'
+.PHONY: arm64-test
+
+arm64-build-libs:
+	docker buildx build \
+		-t $(REPOSITORY):$(TAG)-arm64-libs \
+		--network=host \
+		--platform linux/arm64 \
+		-f docker/arm64/libs/Dockerfile .
+.PHONY: arm64-build-libs
+
+arm64-run-libs:
+	@docker run --rm -it \
+		-v $(PWD):/root/src \
+		-v $(PWD)/docker/arm64/libs/cargo.toml:/root/.cargo/config.toml \
+		-w /root/src \
+			$(REPOSITORY):$(TAG)-arm64-libs \
+				bash
+.PHONY: arm64-run-libs
+
+arm64-test-libs:
+	@docker run --rm \
+		-v $(PWD):/root/src \
+		-w /root/src \
+			$(REPOSITORY):$(TAG)-arm64-libs \
+				bash -c 'set -eu; test-all'
+.PHONY: arm64-test-libs
+
+
+# Testing Tasks (inside the container)
 
 test-all: test-app test-zlib test-openssl
 .PHONY: test-all
@@ -176,8 +219,7 @@ test-zlib:
 			cargo build -v --release --target aarch64-apple-darwin \
 		&& du -sh target/aarch64-apple-darwin/release/zlib-test \
 		&& file target/aarch64-apple-darwin/release/zlib-test \
-		&& echo \
-
+		&& echo
 .ONESHELL: test-zlib
 
 test-openssl:
@@ -243,5 +285,18 @@ test-openssl:
 		&& du -sh target/aarch64-apple-darwin/release/openssl-test \
 		&& file target/aarch64-apple-darwin/release/openssl-test \
 		&& echo
-
 .ONESHELL: test-openssl
+
+# Use to build both arm64 and amd64 images at the same time.
+# WARNING! Will automatically push, since multi-platform images are not available locally.
+# Use `REPOSITORY` arg to specify which container repository to push the images to.
+buildx:
+	docker run --privileged --rm tonistiigi/binfmt --install linux/amd64,linux/arm64
+	docker buildx create --name darwin-builder --driver docker-container --bootstrap
+	docker buildx use darwin-builder
+	docker buildx build \
+		--platform linux/amd64,linux/arm64 \
+		--push \
+		-t $(REPOSITORY):$(TAG) \
+		-f Dockerfile .
+.PHONY: buildx
