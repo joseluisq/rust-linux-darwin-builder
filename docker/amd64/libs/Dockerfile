@@ -1,6 +1,4 @@
-ARG BASE_IMAGE=joseluisq/rust-linux-darwin-builder:2.0.0-beta.1
-
-FROM ${BASE_IMAGE}
+FROM joseluisq/rust-linux-darwin-builder:2.0.0-beta.1
 
 # zlib - http://zlib.net/
 ARG ZLIB_VERSION=1.3.1
