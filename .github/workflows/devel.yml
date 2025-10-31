@@ -1,16 +1,18 @@
 name: devel
 on:
   pull_request:
-    branches:
-      - master
     paths:
       - docker/**
+      - tests/**
+      - Makefile
       - .github/workflows/*.yml
   push:
     branches:
       - master
     paths:
       - docker/**
+      - tests/**
+      - Makefile
       - .github/workflows/*.yml
 
 env:
