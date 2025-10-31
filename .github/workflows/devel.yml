@@ -14,17 +14,12 @@ on:
       - .github/workflows/*.yml
 
 env:
-  DOCKER_IMAGE: localhost:5000/github.com/joseluisq/rust-linux-darwin-builder
+  DOCKER_IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
   docker-amd64:
     name: Docker test (amd64)
     runs-on: ubuntu-22.04
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
     steps:
       -
         name: Checkout
@@ -34,18 +29,20 @@ jobs:
       # https://github.com/actions/runner-images/issues/2840
       - name: Free disk space
         run: |
-          sudo rm -rf /opt/ghc
           sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf /usr/local/lib/android/sdk/build-tools
+          sudo rm -rf /usr/local/lib/android/sdk/cmake
+          sudo rm -rf /usr/local/lib/android/sdk/cmdline-tools
+          sudo rm -rf /usr/local/lib/android/sdk/extras
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
       -
-        name: Cache Docker layers
-        uses: actions/cache@v4
+        name: Login to ghcr.io
+        uses: docker/login-action@v3
+        # if: github.ref == 'refs/heads/main'
         with:
-          path: /tmp/.buildx-cache
-          key: rust-linux-darwin-builder-amd64-buildx-${{ github.sha }}
-          restore-keys: |
-            rust-linux-darwin-builder-amd64-buildx-
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -57,74 +54,67 @@ jobs:
           images: ${{ env.DOCKER_IMAGE }}
           flavor: |
             latest=false
-            suffix=-amd64
           tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha
-            type=raw,value=devel,suffix=-amd64
+            type=raw,value=devel-amd64
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
       -
-        name: Build and export to Docker client
+        name: Build image
         uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64
           file: docker/amd64/base/Dockerfile
-          load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=0.0.0
-          push: ${{ github.event_name != 'pull_request' }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          push: false
+          load: true
+          cache-from: type=gha,scope=devel-amd64
+          cache-to: type=gha,scope=devel-amd64,mode=max
       -
         name: Inspect image
         run: |
           docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
       -
-        name: Check manifest
-        if: github.event_name != 'pull_request'
-        run: |
-          docker buildx imagetools inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
-      -
         name: Run tests
         uses: addnab/docker-run-action@v3
         with:
-            image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}"
-            shell: bash
-            options: -v ${{ github.workspace }}:/root/src
-            run: |
-              set -eux
-              cat /etc/debian_version
-              uname -a
-              make test-app
+          image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}"
+          shell: bash
+          options: -v ${{ github.workspace }}:/root/src
+          run: |
+            set -eux
+            cat /etc/debian_version
+            uname -a
+            make test-app
       -
-        # Temp fix
-        # https://github.com/docker/build-push-action/issues/252
-        # https://github.com/moby/buildkit/issues/1896
-        name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-
-      -
-        name: Cache Docker layers (libs)
-        uses: actions/cache@v4
+        name: Build image & push
+        uses: docker/build-push-action@v6
         with:
-          path: /tmp/.buildx-cache2
-          key: rust-linux-darwin-builder-amd64-libs-buildx-${{ github.sha }}
-          restore-keys: |
-            rust-linux-darwin-builder-amd64-libs-buildx-
+          context: .
+          platforms: linux/amd64
+          file: docker/amd64/base/Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=0.0.0
+          # push: ${{ github.ref == 'refs/heads/master' }}
+          push: true
+          cache-from: type=gha,scope=devel-amd64
+          cache-to: type=gha,scope=devel-amd64,mode=max
+      -
+        name: Check manifest
+        # if: github.ref == 'refs/heads/master'
+        run: |
+          docker buildx imagetools inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
+
+      ## Docker AMD64 libs
+
       -
         name: Docker meta (libs)
         id: meta2
@@ -133,69 +123,70 @@ jobs:
           images: ${{ env.DOCKER_IMAGE }}
           flavor: |
             latest=false
-            suffix=-amd64-libs
           tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha
+            type=raw,value=devel-libs-amd64
       -
         name: Set up Docker Buildx (libs)
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
       -
-        name: Build and export to Docker client
+        name: Build image (libs)
         uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64
           file: docker/amd64/libs/Dockerfile
-          load: true
           tags: ${{ steps.meta2.outputs.tags }}
           labels: ${{ steps.meta2.outputs.labels }}
           build-args: |
             VERSION=0.0.0
-          push: ${{ github.event_name != 'pull_request' }}
+          push: false
+          load: true
           cache-from: |
-            type=local,src=/tmp/.buildx-cache
-            type=local,src=/tmp/.buildx-cache2
-          cache-to: |
-            type=local,dest=/tmp/.buildx-cache2-new,mode=max
+            type=gha,scope=devel-libs-amd64
+            type=gha,scope=devel-amd64
+          cache-to: type=gha,scope=devel-libs-amd64,mode=max
       -
-        name: Inspect image
+        name: Inspect image (libs)
         run: |
           docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}
       -
-        name: Check manifest
-        if: github.event_name != 'pull_request'
-        run: |
-          docker buildx imagetools inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}
-      -
-        name: Run tests
+        name: Run tests (libs)
         uses: addnab/docker-run-action@v3
         with:
-            image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}"
-            shell: bash
-            options: -v ${{ github.workspace }}:/root/src
-            run: |
-              set -eux
-              cat /etc/debian_version
-              uname -a
-              make test-app
-              make test-zlib
-              make test-openssl
+          image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}"
+          shell: bash
+          options: -v ${{ github.workspace }}:/root/src
+          run: |
+            set -eux
+            cat /etc/debian_version
+            uname -a
+            make test-app
+            make test-zlib
+            make test-openssl
       -
-        # Temp fix
-        # https://github.com/docker/build-push-action/issues/252
-        # https://github.com/moby/buildkit/issues/1896
-        name: Move cache
+        name: Build image & push (libs)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          file: docker/amd64/libs/Dockerfile
+          tags: ${{ steps.meta2.outputs.tags }}
+          labels: ${{ steps.meta2.outputs.labels }}
+          build-args: |
+            VERSION=0.0.0
+          # push: ${{ github.ref == 'refs/heads/master' }}
+          push: true
+          cache-from: |
+            type=gha,scope=devel-libs-amd64
+            type=gha,scope=devel-amd64
+          cache-to: type=gha,scope=devel-libs-amd64,mode=max
+      -
+        name: Check manifest (libs)
+        # if: github.ref == 'refs/heads/master'
         run: |
-          rm -rf /tmp/.buildx-cache2
-          mv /tmp/.buildx-cache2-new /tmp/.buildx-cache2
+          docker buildx imagetools inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}
 
   # docker-arm64:
   #   name: Docker test (arm64)
