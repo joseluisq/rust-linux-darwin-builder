@@ -1,9 +1,15 @@
-ARG BASE_IMAGE=joseluisq/rust-linux-darwin-builder:2.0.0-beta.1
+FROM joseluisq/rust-linux-darwin-builder:2.0.0-beta.1
 
-FROM ${BASE_IMAGE}
+LABEL version="${VERSION}" \
+    description="Docker image for cross-compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
+    maintainer="Jose Quintana <joseluisq.net>"
+
+ARG VERSION=0.0.0
+ENV VERSION=${VERSION}
 
 # zlib - http://zlib.net/
 ARG ZLIB_VERSION=1.3.1
+
 # Crate-related environment variables
 ENV LIBZ_SYS_STATIC=1
 

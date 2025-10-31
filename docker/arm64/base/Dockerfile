@@ -1,14 +1,14 @@
 FROM joseluisq/docker-osxcross:1.0.0-beta.1
 
+LABEL version="${VERSION}" \
+    description="Docker image for cross-compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
+    maintainer="Jose Quintana <joseluisq.net>"
+
 ARG VERSION=0.0.0
 ENV VERSION=${VERSION}
 
 # Rust stable toolchain
 ARG TOOLCHAIN=1.87.0
-
-LABEL version="${VERSION}" \
-    description="Use same Docker image for compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
-    maintainer="Jose Quintana <joseluisq.net>"
 
 RUN set -eux \
     && dpkg --add-architecture amd64 \
