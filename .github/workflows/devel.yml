@@ -18,7 +18,7 @@ env:
 
 jobs:
   docker-amd64:
-    name: Docker test (AMD64)
+    name: Docker devel (amd64)
     runs-on: ubuntu-22.04
     steps:
       -
@@ -36,18 +36,17 @@ jobs:
           sudo rm -rf /usr/local/lib/android/sdk/extras
           sudo rm -rf /usr/local/lib/android/sdk/ndk
       -
-        name: Login to ghcr.io
+        name: Login
         uses: docker/login-action@v3
-        # if: github.ref == 'refs/heads/main'
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
-        name: Set up QEMU
+        name: QEMU
         uses: docker/setup-qemu-action@v3
       -
-        name: Docker meta
+        name: Metadata (base)
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -57,12 +56,12 @@ jobs:
           tags: |
             type=raw,value=devel-amd64
       -
-        name: Set up Docker Buildx
+        name: Setup (base)
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
       -
-        name: Build image
+        name: Build (base)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -77,11 +76,11 @@ jobs:
           cache-from: type=gha,scope=devel-amd64
           cache-to: type=gha,scope=devel-amd64,mode=max
       -
-        name: Inspect image
+        name: Inspect (base)
         run: |
           docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
       -
-        name: Run tests
+        name: Tests (base)
         uses: addnab/docker-run-action@v3
         with:
           image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}"
@@ -93,7 +92,7 @@ jobs:
             uname -a
             make test-app
       -
-        name: Build image & push
+        name: Push (base)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -103,20 +102,18 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=0.0.0
-          # push: ${{ github.ref == 'refs/heads/master' }}
           push: true
           cache-from: type=gha,scope=devel-amd64
           cache-to: type=gha,scope=devel-amd64,mode=max
       -
-        name: Check manifest
-        # if: github.ref == 'refs/heads/master'
+        name: Manifest (base)
         run: |
           docker buildx imagetools inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
 
       ## AMD64 libs
 
       -
-        name: Docker meta (libs)
+        name: Metadata (libs)
         id: meta2
         uses: docker/metadata-action@v5
         with:
@@ -126,12 +123,12 @@ jobs:
           tags: |
             type=raw,value=devel-libs-amd64
       -
-        name: Set up Docker Buildx (libs)
+        name: Setup (libs)
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
       -
-        name: Build image (libs)
+        name: Build (libs)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -148,11 +145,11 @@ jobs:
             type=gha,scope=devel-amd64
           cache-to: type=gha,scope=devel-libs-amd64,mode=max
       -
-        name: Inspect image (libs)
+        name: Inspect (libs)
         run: |
           docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}
       -
-        name: Run tests (libs)
+        name: Tests (libs)
         uses: addnab/docker-run-action@v3
         with:
           image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}"
@@ -166,7 +163,7 @@ jobs:
             make test-zlib
             make test-openssl
       -
-        name: Build image & push (libs)
+        name: Push (libs)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -176,20 +173,18 @@ jobs:
           labels: ${{ steps.meta2.outputs.labels }}
           build-args: |
             VERSION=0.0.0
-          # push: ${{ github.ref == 'refs/heads/master' }}
           push: true
           cache-from: |
             type=gha,scope=devel-libs-amd64
             type=gha,scope=devel-amd64
           cache-to: type=gha,scope=devel-libs-amd64,mode=max
       -
-        name: Check manifest (libs)
-        # if: github.ref == 'refs/heads/master'
+        name: Manifest (libs)
         run: |
           docker buildx imagetools inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}
 
   docker-arm64:
-    name: Docker test (ARM64)
+    name: Docker devel (arm64)
     runs-on: ubuntu-22.04-arm
     steps:
       -
@@ -207,18 +202,17 @@ jobs:
           sudo rm -rf /usr/local/lib/android/sdk/extras
           sudo rm -rf /usr/local/lib/android/sdk/ndk
       -
-        name: Login to ghcr.io
+        name: Login
         uses: docker/login-action@v3
-        # if: github.ref == 'refs/heads/main'
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
-        name: Set up QEMU
+        name: QEMU
         uses: docker/setup-qemu-action@v3
       -
-        name: Docker meta
+        name: Metadata (base)
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -228,12 +222,12 @@ jobs:
           tags: |
             type=raw,value=devel-arm64
       -
-        name: Set up Docker Buildx
+        name: Setup (base)
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
       -
-        name: Build image
+        name: Build (base)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -248,11 +242,11 @@ jobs:
           cache-from: type=gha,scope=devel-arm64
           cache-to: type=gha,scope=devel-arm64,mode=max
       -
-        name: Inspect image
+        name: Inspect (base)
         run: |
           docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
       -
-        name: Run tests
+        name: Tests (base)
         uses: addnab/docker-run-action@v3
         with:
           image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}"
@@ -264,7 +258,7 @@ jobs:
             uname -a
             make test-app
       -
-        name: Build image & push
+        name: Push (base)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -274,20 +268,18 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VERSION=0.0.0
-          # push: ${{ github.ref == 'refs/heads/master' }}
           push: true
           cache-from: type=gha,scope=devel-arm64
           cache-to: type=gha,scope=devel-arm64,mode=max
       -
-        name: Check manifest
-        # if: github.ref == 'refs/heads/master'
+        name: Manifest (base)
         run: |
           docker buildx imagetools inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
 
       ## ARM64 libs
 
       -
-        name: Docker meta (libs)
+        name: Metadata (libs)
         id: meta2
         uses: docker/metadata-action@v5
         with:
@@ -297,12 +289,12 @@ jobs:
           tags: |
             type=raw,value=devel-libs-arm64
       -
-        name: Set up Docker Buildx (libs)
+        name: Setup (libs)
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
       -
-        name: Build image (libs)
+        name: Build (libs)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -319,11 +311,11 @@ jobs:
             type=gha,scope=devel-arm64
           cache-to: type=gha,scope=devel-libs-arm64,mode=max
       -
-        name: Inspect image (libs)
+        name: Inspect (libs)
         run: |
           docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}
       -
-        name: Run tests (libs)
+        name: Tests (libs)
         uses: addnab/docker-run-action@v3
         with:
           image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}"
@@ -337,7 +329,7 @@ jobs:
             make test-zlib
             make test-openssl
       -
-        name: Build image & push (libs)
+        name: Push (libs)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -347,14 +339,12 @@ jobs:
           labels: ${{ steps.meta2.outputs.labels }}
           build-args: |
             VERSION=0.0.0
-          # push: ${{ github.ref == 'refs/heads/master' }}
           push: true
           cache-from: |
             type=gha,scope=devel-libs-arm64
             type=gha,scope=devel-arm64
           cache-to: type=gha,scope=devel-libs-arm64,mode=max
       -
-        name: Check manifest (libs)
-        # if: github.ref == 'refs/heads/master'
+        name: Manifest (libs)
         run: |
           docker buildx imagetools inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}
