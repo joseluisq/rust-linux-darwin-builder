@@ -1,0 +1,206 @@
+name: devel-1.x
+on:
+  pull_request:
+    branches:
+      - '1.x'
+    paths:
+      - Dockerfile
+      - cargo/config.toml
+      - .github/workflows/devel.yaml
+  push:
+    branches:
+      - 1.x
+    paths:
+      - Dockerfile
+      - cargo/config.toml
+      - .github/workflows/devel.yaml
+
+env:
+  DOCKER_IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  docker-amd64:
+    name: Docker devel (amd64)
+    runs-on: ubuntu-22.04
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      # https://github.com/actions/runner-images/issues/2840
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android/sdk/build-tools
+          sudo rm -rf /usr/local/lib/android/sdk/cmake
+          sudo rm -rf /usr/local/lib/android/sdk/cmdline-tools
+          sudo rm -rf /usr/local/lib/android/sdk/extras
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
+      -
+        name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Metadata (base)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_IMAGE }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=devel-1x-amd64
+      -
+        name: Setup (base)
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+      -
+        name: Build (base)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          file: Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=0.0.0
+          push: false
+          load: true
+          cache-from: type=gha,scope=devel-1x-amd64
+          cache-to: type=gha,scope=devel-1x-amd64,mode=max
+      -
+        name: Inspect (base)
+        run: |
+          docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
+      -
+        name: Tests (base)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}"
+          shell: bash
+          options: -v ${{ github.workspace }}:/root/src
+          run: |
+            set -eux
+            cat /etc/debian_version
+            uname -a
+            make test-ci
+      -
+        name: Push (base)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          file: Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=0.0.0
+          push: true
+          cache-from: type=gha,scope=devel-1x-amd64
+          cache-to: type=gha,scope=devel-1x-amd64,mode=max
+      -
+        name: Manifest (base)
+        run: |
+          docker buildx imagetools inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
+
+  docker-arm64:
+    name: Docker devel (arm64)
+    runs-on: ubuntu-22.04-arm
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      # https://github.com/actions/runner-images/issues/2840
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android/sdk/build-tools
+          sudo rm -rf /usr/local/lib/android/sdk/cmake
+          sudo rm -rf /usr/local/lib/android/sdk/cmdline-tools
+          sudo rm -rf /usr/local/lib/android/sdk/extras
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
+      -
+        name: Login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Metadata (base)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_IMAGE }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=devel-1x-arm64
+      -
+        name: Setup (base)
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+      -
+        name: Build (base)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          file: Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=0.0.0
+          push: false
+          load: true
+          cache-from: type=gha,scope=devel-1x-arm64
+          cache-to: type=gha,scope=devel-1x-arm64,mode=max
+      -
+        name: Inspect (base)
+        run: |
+          docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
+      -
+        name: Tests (base)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}"
+          shell: bash
+          options: -v ${{ github.workspace }}:/root/src
+          run: |
+            set -eux
+            cat /etc/debian_version
+            uname -a
+            make test-ci
+      -
+        name: Push (base)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          file: Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=0.0.0
+          push: true
+          cache-from: type=gha,scope=devel-1x-arm64
+          cache-to: type=gha,scope=devel-1x-arm64,mode=max
+      -
+        name: Manifest (base)
+        run: |
+          docker buildx imagetools inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
