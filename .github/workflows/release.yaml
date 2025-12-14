@@ -1,12 +1,15 @@
-name: release
+name: release-1.x
 on:
   push:
     tags:
-    - 'v1.0.[0-9]+'
+    - 'v1.[0-9]+.[0-9]+'
+
+env:
+  DOCKER_IMAGE: ghcr.io/joseluisq/rust-linux-darwin-builder
 
 jobs:
-  build-amd64:
-    name: build (amd64)
+  docker-amd64:
+    name: Docker release (amd64)
     runs-on: ubuntu-22.04
     steps:
       -
@@ -24,23 +27,6 @@ jobs:
           sudo rm -rf /usr/local/lib/android/sdk/extras
           sudo rm -rf /usr/local/lib/android/sdk/ndk
       -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      -
-        name: Docker meta
-        id: meta-amd64
-        uses: docker/metadata-action@v5
-        with:
-          images: joseluisq/rust-linux-darwin-builder
-          flavor: |
-            latest=true
-            suffix=-amd64
-          tags: |
-            type=semver,pattern={{version}}
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      -
         name: Login to ghcr.io
         uses: docker/login-action@v3
         with:
@@ -54,42 +40,94 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          provenance: false
-          context: .
-          platforms: linux/amd64
-          file: Dockerfile
-          tags: ${{ steps.meta-amd64.outputs.tags }}
-
-  build-arm64:
-    name: build (arm64)
-    runs-on: ubuntu-22.04-arm
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: Set up QEMU
+        name: QEMU
         uses: docker/setup-qemu-action@v3
       -
-        name: Docker meta
-        id: meta-arm64
+        name: Metadata (base)
+        id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
             joseluisq/rust-linux-darwin-builder
             ghcr.io/joseluisq/rust-linux-darwin-builder
           flavor: |
-            latest=true
-            suffix=-arm64
+            latest=false
+            suffix=-amd64
           tags: |
             type=semver,pattern={{version}}
+            type=semver,pattern={{version}}-amd64
       -
-        name: Set up Docker Buildx
+        name: Setup (base)
         uses: docker/setup-buildx-action@v3
+      -
+        name: Build (base)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          file: Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+          push: false
+          load: true
+          cache-from: type=gha,scope=devel-1x-amd64
+          cache-to: type=gha,scope=devel-1x-amd64,mode=max
+      -
+        name: Inspect (base)
+        run: |
+          docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
+      -
+        name: Tests (base)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}"
+          shell: bash
+          options: -v ${{ github.workspace }}:/root/src
+          run: |
+            set -eux
+            cat /etc/debian_version
+            uname -a
+            make test-ci
+      -
+        name: Push (base)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          file: Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+          push: true
+          provenance: false
+          cache-from: type=gha,scope=devel-1x-amd64
+          cache-to: type=gha,scope=devel-1x-amd64,mode=max
+      -
+        name: Manifest (base)
+        run: |
+          docker buildx imagetools inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
+
+  docker-arm64:
+    name: Docker release (arm64)
+    runs-on: ubuntu-22.04-arm
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      # https://github.com/actions/runner-images/issues/2840
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android/sdk/build-tools
+          sudo rm -rf /usr/local/lib/android/sdk/cmake
+          sudo rm -rf /usr/local/lib/android/sdk/cmdline-tools
+          sudo rm -rf /usr/local/lib/android/sdk/extras
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
       -
         name: Login to ghcr.io
         uses: docker/login-action@v3
@@ -104,20 +142,81 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Build and push
+        name: QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Metadata (base)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            joseluisq/rust-linux-darwin-builder
+            ghcr.io/joseluisq/rust-linux-darwin-builder
+          flavor: |
+            latest=false
+            suffix=-arm64
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{version}}-arm64
+      -
+        name: Setup (base)
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Build (base)
         uses: docker/build-push-action@v6
         with:
-          push: true
-          provenance: false
           context: .
           platforms: linux/arm64
           file: Dockerfile
-          tags: ${{ steps.meta-arm64.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+          push: false
+          load: true
+          cache-from: type=gha,scope=devel-1x-arm64
+          cache-to: type=gha,scope=devel-1x-arm64,mode=max
+      -
+        name: Inspect (base)
+        run: |
+          docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
+      -
+        name: Tests (base)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}"
+          shell: bash
+          options: -v ${{ github.workspace }}:/root/src
+          run: |
+            set -eux
+            cat /etc/debian_version
+            uname -a
+            make test-ci
+      -
+        name: Push (base)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          file: Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+          push: true
+          provenance: false
+          cache-from: type=gha,scope=devel-1x-arm64
+          cache-to: type=gha,scope=devel-1x-arm64,mode=max
+      -
+        name: Manifest (base)
+        run: |
+          docker buildx imagetools inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
 
   manifest:
+    name: Docker release (manifest)
     needs:
-      - build-amd64
-      - build-arm64
+      - docker-amd64
+      - docker-arm64
     runs-on: ubuntu-22.04
     steps:
       # https://github.com/actions/runner-images/issues/2840
@@ -172,12 +271,12 @@ jobs:
           docker manifest push joseluisq/rust-linux-darwin-builder:$SEMVER_MINOR
 
           docker manifest create \
-            ghcr.io/joseluisq/rust-lisq/rust-linux-darwin-builder:$SEMVER-arm64
+            ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER_MINOR \
+              --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-amd64 \
+              --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-arm64
           docker manifest push ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER_MINOR
       -
-        name: Push latest (1.0 or newer)nux-darwin-builder:$SEMVER_MINOR \
-              --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-amd64 \
-              --amend ghcr.io/joselui
+        name: Push latest (1.0)
         run: |
           docker manifest create \
             joseluisq/rust-linux-darwin-builder:latest \
@@ -186,7 +285,7 @@ jobs:
           docker manifest push joseluisq/rust-linux-darwin-builder:latest
 
           docker manifest create \
-            ghcr.io/joseluisghcr.io/q/rust-linux-darwin-builder:latest \
+            ghcr.io/joseluisq/rust-linux-darwin-builder:latest \
               --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-amd64 \
               --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-arm64
           docker manifest push ghcr.io/joseluisq/rust-linux-darwin-builder:latest
@@ -205,7 +304,7 @@ jobs:
               --amend ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER-arm64
           docker manifest push ghcr.io/joseluisq/rust-linux-darwin-builder:$SEMVER
       -
-        name: Push semver major alias (1.0 or newer)
+        name: Push semver major alias (1.0)
         run: |
           docker manifest create \
             joseluisq/rust-linux-darwin-builder:$SEMVER_MAJOR \
