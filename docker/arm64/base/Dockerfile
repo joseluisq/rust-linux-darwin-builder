@@ -8,7 +8,7 @@ ARG VERSION=0.0.0
 ENV VERSION=${VERSION}
 
 # Rust stable toolchain
-ARG TOOLCHAIN=1.87.0
+ARG TOOLCHAIN=1.88.0
 
 RUN set -eux \
     && dpkg --add-architecture amd64 \
