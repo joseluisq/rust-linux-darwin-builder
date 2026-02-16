@@ -83,16 +83,13 @@ jobs:
           docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
       -
         name: Tests (base)
-        uses: addnab/docker-run-action@v3
-        with:
-          image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}"
-          shell: bash
-          options: -v ${{ github.workspace }}:/root/src
-          run: |
-            set -eux
-            cat /etc/debian_version
-            uname -a
-            make test-app
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/root/src \
+            ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }} \
+              bash -c 'set -eux; \
+                cat /etc/debian_version; \
+                uname -a; \
+                make test-app'
       -
         name: Push (base)
         uses: docker/build-push-action@v6
@@ -139,7 +136,7 @@ jobs:
           tags: ${{ steps.meta2.outputs.tags }}
           labels: ${{ steps.meta2.outputs.labels }}
           build-args: |
-            VERSION=0.0.0
+            VERSION=devel-amd64
           push: false
           load: true
           cache-from: |
@@ -152,18 +149,15 @@ jobs:
           docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}
       -
         name: Tests (libs)
-        uses: addnab/docker-run-action@v3
-        with:
-          image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}"
-          shell: bash
-          options: -v ${{ github.workspace }}:/root/src
-          run: |
-            set -eux
-            cat /etc/debian_version
-            uname -a
-            make test-app
-            make test-zlib
-            make test-openssl
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/root/src \
+            "${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}" \
+              bash -c 'set -eux; \
+                cat /etc/debian_version; \
+                uname -a; \
+                make test-app; \
+                make test-zlib; \
+                make test-openssl'
       -
         name: Push (libs)
         uses: docker/build-push-action@v6
@@ -174,7 +168,7 @@ jobs:
           tags: ${{ steps.meta2.outputs.tags }}
           labels: ${{ steps.meta2.outputs.labels }}
           build-args: |
-            VERSION=0.0.0
+            VERSION=devel-amd64
           push: true
           cache-from: |
             type=gha,scope=devel-libs-amd64
@@ -249,16 +243,13 @@ jobs:
           docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}
       -
         name: Tests (base)
-        uses: addnab/docker-run-action@v3
-        with:
-          image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}"
-          shell: bash
-          options: -v ${{ github.workspace }}:/root/src
-          run: |
-            set -eux
-            cat /etc/debian_version
-            uname -a
-            make test-app
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/root/src \
+            "${{ env.DOCKER_IMAGE }}:${{ steps.meta.outputs.version }}" \
+              bash -c 'set -eux; \
+                cat /etc/debian_version; \
+                uname -a; \
+                make test-app'
       -
         name: Push (base)
         uses: docker/build-push-action@v6
@@ -305,7 +296,7 @@ jobs:
           tags: ${{ steps.meta2.outputs.tags }}
           labels: ${{ steps.meta2.outputs.labels }}
           build-args: |
-            VERSION=0.0.0
+            VERSION=devel-arm64
           push: false
           load: true
           cache-from: |
@@ -318,18 +309,15 @@ jobs:
           docker image inspect ${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}
       -
         name: Tests (libs)
-        uses: addnab/docker-run-action@v3
-        with:
-          image: "${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}"
-          shell: bash
-          options: -v ${{ github.workspace }}:/root/src
-          run: |
-            set -eux
-            cat /etc/debian_version
-            uname -a
-            make test-app
-            make test-zlib
-            make test-openssl
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/root/src \
+            "${{ env.DOCKER_IMAGE }}:${{ steps.meta2.outputs.version }}" \
+              bash -c 'set -eux; \
+                cat /etc/debian_version; \
+                uname -a; \
+                make test-app; \
+                make test-zlib; \
+                make test-openssl;'
       -
         name: Push (libs)
         uses: docker/build-push-action@v6
@@ -340,7 +328,7 @@ jobs:
           tags: ${{ steps.meta2.outputs.tags }}
           labels: ${{ steps.meta2.outputs.labels }}
           build-args: |
-            VERSION=0.0.0
+            VERSION=devel-arm64
           push: true
           cache-from: |
             type=gha,scope=devel-libs-arm64

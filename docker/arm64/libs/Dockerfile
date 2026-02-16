@@ -1,10 +1,11 @@
-FROM joseluisq/rust-linux-darwin-builder:2.0.0-beta.1
+ARG VERSION=2.0.0-beta.1
+
+FROM ghcr.io/joseluisq/rust-linux-darwin-builder:${VERSION}
 
 LABEL version="${VERSION}" \
     description="Docker image for cross-compiling Rust programs for Linux (musl libc) & macOS (osxcross)." \
     maintainer="Jose Quintana <joseluisq.net>"
 
-ARG VERSION=0.0.0
 ENV VERSION=${VERSION}
 
 # zlib - http://zlib.net/
