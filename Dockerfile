@@ -116,7 +116,7 @@ RUN set -eux \
 
 
 # zlib - http://zlib.net/
-ARG ZLIB_VERSION=1.3.1
+ARG ZLIB_VERSION=1.3.2
 
 RUN set -eux \
     && echo "Building zlib ${ZLIB_VERSION}..." \
@@ -220,7 +220,7 @@ RUN set -eux \
     && true
 
 # Rust stable toolchain
-ARG TOOLCHAIN=1.87.0
+ARG TOOLCHAIN=1.88.0
 
 # Install our Rust toolchain and the `musl` target. We patch the
 # command-line we pass to the installer so that it won't attempt to
