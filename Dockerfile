@@ -220,7 +220,7 @@ RUN set -eux \
     && true
 
 # Rust stable toolchain
-ARG TOOLCHAIN=1.88.0
+ARG TOOLCHAIN=1.89.0
 
 # Install our Rust toolchain and the `musl` target. We patch the
 # command-line we pass to the installer so that it won't attempt to
