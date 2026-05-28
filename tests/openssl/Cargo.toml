@@ -5,7 +5,7 @@ authors = ["Jose Quintana <https://github.com/joseluisq>"]
 edition = "2021"
 
 [dependencies]
-openssl = { version = "0.10.73" }
+openssl = { version = "0.10.80" }
 
 [profile.release]
 lto = true
